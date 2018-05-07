@@ -1,0 +1,13 @@
+"Alternativa","Bar","Vier-Sab","Hambriento","Clientes","Precio","Lloviendo","Reserva","Tipo","TpoEspera","Esperar"
+"Si","No","No","Si","Algunos","$$$","No","Si","Frances","0-10",1
+"Si","No","No","Si","Lleno","$","No","No","Tailandes","30-60",0
+"No","Si","No","No","Algunos","$","No","No","Hamburg","0-10",1
+"Si","No","Si","Si","Lleno","$","Si","No","Tailandes","10-30",1
+"Si","No","Si","No","Lleno","$$$","No","Si","Frances",">60",0
+"No","Si","No","Si","Algunos","$$","Si","Si","Italiano","0-10",1
+"No","Si","No","No","Ninguno","$","Si","No","Hamburg","0-10",0
+"No","No","No","Si","Algunos","$$","Si","Si","Tailandes","0-10",1
+"No","Si","Si","No","Lleno","$","Si","No","Hamburg",">60",0
+"Si","Si","Si","Si","Lleno","$$$","No","Si","Italiano","10-30",0
+"No","No","No","No","Ninguno","$","No","No","Tailandes","0-10",0
+"Si","Si","Si","Si","Lleno","$","No","No","Hamburg","30-60",1

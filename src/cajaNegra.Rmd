@@ -1,0 +1,212 @@
+---
+title: 'AM - Laboratorio I: Caja negra'
+output:
+  html_document:
+    df_print: paged
+---
+
+
+## Motivación de Decision Tree y Naive Bayes: resolviendo clasificación de SPAM
+
+Desde hace muchos años, el spam ha sido un problema creciente. Aquí se va a
+construir un clasificador para distinguir entre mensajes **''reales''** de grupos de
+noticias y mensajes spam. Para ello vamos a utilizar dos algoritmos de 
+clasificación diferentes: árboles de decisión y Naive Bayes.
+
+Para este experimento, se han obtenido una serie de correos electrónicos no deseados, 
+y un conjunto genuino de mensajes de grupos de noticias. Puede encontrar los 
+correo originales en (https://people.cs.umass.edu/$\sim$mccallum/data/20\_newsgroups.tar.gz). 
+
+Utilizando sólo
+el asunto (subject) y el contenido de cada mensaje vamos a aprender a distinguir entre un mensaje **SPAM** y **NO-SPAM**. 
+
+Con el fin de obtener el texto de los correos electrónicos en una forma utilizable para los algoritmos, se ha 
+realizado un pre-procesamientode los mensajes. Se ha elaborado una lista de palabras del vocabulario 
+de los mails (tokens) que contiene las palabras más relevantes.
+
+En el directorio data del laboratorio encontrará dos datasets: MATRIX.TRAIN, para usar como conjunto de 
+entrenamiento, y MATRIX.TEST como conjunto de testeo. A cada dataset se le asocia una 
+matriz (llamada matriz documento-palabra en clasificación de textos), donde la fila
+*(i-ésima)* representa el mensaje (correo electrónico) *i-ésimo*,
+y la columna *(j-ésima)* representa el token *j-ésimo*. Por lo
+tanto, la entrada *(i,j)* de la matriz representa el número de
+ocurrencias del token *(j)* en el mensaje *(i)*.
+
+Dado que la **matriz documento-palabra** es una matriz rala 
+(tiene muchas entradas con valor cero), el contenido del dataset se encuentra 
+almacenado de forma eficiente para ahorrar espacio de almacenamiento. El 
+archivo **read-matrix.R** proporciona la función **read\_matrix** 
+que lee los datos correctamente desde el archivo.
+
+La función **read_matrix** retorna un objeto tipo **list** con 2 componentes: 
+**tokens**, un vector con los tokens que aparecen en el dataset; y **matrix**, 
+un objeto de tipo **dataset** que contiene la **matriz documento-palabra**. 
+junto con la clasificación (SPAM/NO-SPAM) de cada mensaje.
+
+
+```{r}
+setwd("../src/") # configurar el directorio de trabajo en src
+source("read-matrix.R") 
+m.train <- read_matrix(filename="../data/MATRIX.TRAIN",ocurrence=FALSE,sparse=FALSE) 
+# Acceso a componetes: m.train$tokens y m.train$matrix
+tokens <- m.train$tokens
+trainset <- m.train$matrix
+names(trainset) <- c(m.train$tokens,"category")
+```
+
+### Análisis de la distribución de clases que contiene la **matriz documento-palabra**. 
+
+Previo a la aplicación algoritmo de aprendizaje de máquinas, es muy importante realizar un análisis del conjunto de datos.
+
+Este análisis se basa  normalmente en metodos de la estadistica descriptiva junto a técnicas de visualización. 
+Para esto vamos a utilizar el paquete de graficos de R *ggplot2*.
+
+La funcion ggplot() crea un sistema de coordenadas en donde es posible agregar nuevas capas. El primer argumento de ggplot() es el conjunto de datos sobre el cual queremos graficar. De esta manera en nuestro caso seria ```ggplot(data=trainset)```. El gráfico se completa agregando uno o mas capas a ```ggplot()```. La funcion ```geom_point``` agrega una capa con puntos al gráfico, lo que termina creando lo que se conoce como **scatterplot**. Otra posible capa es la provista por la funcion ```geom_bar```la cual genera graficos de barra. Cada función *geom_XXX* requiere ciertos argumentos que indiquen como se van a **mapear** las variables del conjunto de datos a distintas propiedas visuales (color, forma, relleno, coordenada X, coordenada Y, etc.). Este mapeo se realiza mediante  la funcion ```aes()```. 
+
+
+1. Calcule la distribución de las clases para el problema de SPAM/NO SPAM. Luego Grafique los resultados mediante un grafico de barras.
+```{r}
+# quizas sea necesario instalar el paquete
+# install.packages("ggplot2")
+spam <- 0
+nospam <- 0
+
+  spam <- length(which(m.train$matrix$category=="SPAM"))
+
+  nospam <- length(which(m.train$matrix$category=="NO-SPAM"))
+
+
+distspam<-(spam/nrow(m.train$matrix))*100
+distnospam <- (nospam/nrow(m.train$matrix))*100
+distribucion = c(distspam, distnospam)
+categorias <- c("spam", "no-spam")
+distdata = data.frame(distribucion, categorias)
+
+library(ggplot2)
+ggplot(data= distdata, aes(x=distdata$categorias, y=distdata$distribucion, fill="red")) + geom_bar(stat="identity")+ ggtitle("Distribuci�n de clases") + labs(x="Categorias", y ="Distribuci�n(%)") 
+
+
+
+# en este caso estamos usando las propiedades visuales x y fill (relleno) 
+
+```
+
+2. Calcule las palabras que tienen mayor cantidad de observaciones  en la matriz-documento-frequencia. Luego grafique su distribución  en función de las clases SPAM/NO SPAM. Para realizar el calculo se pueden  utilizar las funciones ``ColSums()``` y la funcion ```sort()```. Además se puede consultar la ayuda en línea.
+
+```{r}
+#INSERTAR CODIGO AQUI
+
+# matriz <- trainset[1:(ncol(m.train$matrix)-1)]
+# rdo <- sort(colSums(matriz), decreasing = TRUE)
+rdospam <- trainset[which(m.train$matrix$category == "SPAM"), 1:(ncol(m.train$matrix)-1)]
+cantrepetespam <- sort(colSums(rdospam), decreasing = TRUE)
+rdoNospam <- trainset[which(m.train$matrix$category == "NO-SPAM"), 1:(ncol(m.train$matrix)-1)]
+cantrepetNoSpam <- sort(colSums(rdoNospam), decreasing = TRUE)
+
+grafspam <- data.frame(names(cantrepetespam)[1:7], cantrepetespam[1:7])
+grafnospam <- data.frame(names(cantrepetNoSpam)[1:7], cantrepetNoSpam[1:7])
+ggplot(data= grafspam) + 
+  geom_bar(aes(x=grafspam$names.cantrepetespam., y= grafspam$cantrepetespam), stat="identity", fill="red",alpha=0.3) + 
+  ggtitle("Distribuci�n") + 
+  labs(x="Palabra",y="Frecuencia")+
+  geom_bar(aes(x=grafnospam$names.cantrepetNoSpam., y= grafnospam$cantrepetNoSpam), stat="identity", fill="blue",alpha=0.3)
+
+```
+
+### Punto (A) 
+Vamos a utilizar árboles de decisión para aprender un clasificador de spam usando la matriz
+documento-palabra asociada al dataset MATRIX.TRAIN. Para esto nos vamos a valer del paquete
+**rpart** de **R**. Los datasets deben ser cargados usando la función read_matrix que se explicó
+anteriormente. Una vez aprendido el clasificador de spam se van a clasficar todos los ejemplos
+del dataset MATRIX.TRAIN, presentando 3 columnas como salida: TRUE-VALUE, PREDICTION,
+CORRECT. Puede guiarse mediante el siguiente código y además consultar la ayuda en línea.
+
+```{r}
+# instalar las librerias rpart,rpart.plot
+library("rpart")
+library("rpart.plot")
+tree.model <- rpart(formula=category~.,data=trainset)
+# prp(tree.model)
+colCategory <- ncol(trainset)
+m.pred <- predict(tree.model, trainset[-colCategory])
+aux.pred <- as.matrix(m.pred[,1])
+aux.pred[aux.pred>=0.5] <- "SPAM"
+aux.pred[aux.pred<0.5] <- "NO-SPAM"
+aux.true <- trainset[colCategory]
+result <- cbind(aux.true,aux.pred,aux.true==aux.pred)
+names(result) <- c("TRUE-VALUE", "PREDICTION", "CORRECT?")
+print(result)
+```
+
+### Punto (B) 
+Dado los resultados obtenidos en (A) y indique como calcularía la performance del clasificador.
+
+
+
+
+
+
+### Punto (C) 
+Ahora haremos uso del vector ```m.train$tokens``` para averiguar los índices de los tokens spam,
+*news* y *httpaddr.* Luego quitaremos estos tokens de la matriz documento-palabra y con el dataset
+resultante volveremos a entrenar nuestro clasificador repitiendo los ejercicios (A) y (B).
+
+```{r}
+index.cut <- (1:length(tokens))[tokens=="spam"|tokens=="httpaddr"|tokens=="news"] #devuelve los index de las palabras buscadas
+trainset.cut <- trainset[-index.cut] ##deja el trainset sin las palabras buscadas en la linea anterior
+tree.model.cut <- rpart(formula=category~.,data=trainset.cut)
+prp(tree.model.cut)
+# print(trainset.cut)
+```
+
+### Punto (D) 
+Para evaluar la performance del clasificador aprendido en (A) y (C) sobre un datasets diferente al
+usado para entrenar el clasificador haremos uso del dataset MATRIX.TEST y del método propuesto
+en (B) (notar que MATRIX.TRAIN y MATRIX.TEST son conjuntos disjuntos).
+
+```{r}
+m.test <- read_matrix(filename="../data/MATRIX.TEST",ocurrence=FALSE,sparse=FALSE)
+testset <- m.test$matrix
+names(testset) <- c(m.test$tokens,"category")
+
+#Insertar codigo aqui
+
+```
+
+###Punto (E) 
+Razone sobre la diferencia entre los resultados obtenidos en (B), (C), y (D). ¿Puede explicar que ha sucedido?
+
+
+
+
+
+
+
+### Punto (F)
+Vamos a utilizar Naïve Bayes para aprender un clasificador de spam usando la matriz documento-
+palabra asociada al dataset MATRIX.TRAIN obtenido en (B) trainset.cut. Para esto nos vamos a
+valer del paquete **e1071**
+
+```{r}
+# instalar la libreria e1071
+library("e1071")
+nb.model <- naiveBayes(formula=category~.,data=trainset.cut)
+nb.model
+```
+
+### Punto (G).
+Para evaluar la performance del clasificador aprendido en (F) obtendremos la matriz de confusión y los datasets de entrenamiento trainset.cut y otro diferente testset, que se obtuvieron anteriormente.
+
+```{r}
+# table(predict(nb, trainset.cut), trainset.cut[,ncol(trainset.cut)])
+table(predict(nb.model, trainset.cut), trainset.cut[,ncol(trainset.cut)])
+table(predict(nb.model, testset), testset[,ncol(testset)])
+```
+### Punto (H). 
+
+Obtener la matrices de confusión utilizando el clasificador obtenido en (C) y los datasets trainset.cut y testset. Razone los resultados obtenidos comparando con (G).
+
+```{r Matrices de confusión}
+# Escriba su codigo aquí.
+```
+
