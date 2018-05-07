@@ -98,7 +98,11 @@ best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE)
       cant.etiqueta <- length(which(data[,1] == etiquetas[j]))
       p <- c()
       for(t in 1:length(labelsTarget)){
-        pn <- length(dataEtiqueta[which(dataEtiqueta[,2] == labelsTarget[t])])
+        if(ncol(as.matrix(dataEtiqueta))>1){
+          pn <- length(dataEtiqueta[which(dataEtiqueta[,2] == labelsTarget[t])])
+        }else{
+          pn <- 1
+        }
         p <- c(p, pn)
         # print(paste("cantidad de",etiquetas[j],"con",labelsTarget[t], pn))
       }
@@ -169,7 +173,7 @@ most.common.value <- function(examples, target) {
 #
 # Esta funciÃ³n regresa una lista con dos componentes: 'root', que es la variable nodo
 # obtenido de la iteraciÃ³n con id3, y 'tree' que es el Ã¡rbol construido.
-
+# subtree <- id3(exam, target, attributes[-Anumber], labels, NULL)
 id3 <- function(examples, target, attributes, labels, tree) {
   
   examples <- matrix(examples,ncol=(length(attributes)+1),
@@ -241,26 +245,22 @@ id3 <- function(examples, target, attributes, labels, tree) {
       # ADD YOUR CODE HERE
       #
       ########
-      
-      common.value <- most.common.value(examplesi,examplesi$target)
-      #NOSE COMO PROBAR!
+      class <- labels[i]
+      leaf <- new.leaf(class)
+      tree <- add.subtree(tree,leaf,branchId)
 
     } else {
 
       # <-- ES UNA MATRIX. Es un subconjunto de Examplesi (ver seudocÃ³digo en Mitchel.)
       exam <- NULL
-      #mandar el resto de la matriz examples?
-      print(paste("values actual",VALUES[[attribute]][i]))
       
+      exam <- examples[,-Anumber]
+      # print(paste("LABELS",length(labels)))
       
-      #######
-      #
-      # ADD YOUR CODE HERE
-      #
-      ########
-      tree <- new.tree(root)
+
+      
+
       subtree <- id3(exam, target, attributes[-Anumber], labels, NULL)
-      plot.tree(tree)
 
       tree <- add.subtree(tree,subtree,branchId)
     }
@@ -268,7 +268,6 @@ id3 <- function(examples, target, attributes, labels, tree) {
   }
 
   return(tree)
-  # return(NULL)
 }
 
 # Classify an example from the tree model
