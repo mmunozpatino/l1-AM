@@ -94,7 +94,9 @@ best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE)
       ## FOR POR CADA VALOR DE LA COLUMNA
       # print(paste("ETIQUETA", etiquetas[j]))
       # print(etiquetas[j])
-      dataEtiqueta <- data[which(data[,1] == etiquetas[j]),]
+      dataEtiqueta <- matrix(data = 0, nrow= length(which(data[,1] == etiquetas[j])), ncol=2 )
+      dataEtiqueta[,1] <- data[which(data[,1] == etiquetas[j]),1]
+      dataEtiqueta[,2] <- data[which(data[,1] == etiquetas[j]),2]
       cant.etiqueta <- length(which(data[,1] == etiquetas[j]))
       p <- c()
       for(t in 1:length(labelsTarget)){
@@ -189,7 +191,7 @@ id3 <- function(examples, target, attributes, labels, tree) {
       class <- labels[i]
       root <- new.leaf(class)
 
-      print(paste("leaf ", labels[i]))
+      # print(paste("leaf ", labels[i]))
       
 
       return(new.tree(root))
@@ -201,7 +203,7 @@ id3 <- function(examples, target, attributes, labels, tree) {
     class <- most.common.value(examples, target)
     root <- new.leaf(class)
 
-    print(paste("leaf ", root$label))
+    # print(paste("leaf ", root$label))
 
     return(new.tree(root))
   }
@@ -211,7 +213,8 @@ id3 <- function(examples, target, attributes, labels, tree) {
   # print(paste("mejor atributo:",attribute))
 
   root <- new.node(attribute, VALUES[[attribute]])
-  print(root)
+  
+  # print(root)
   if (is.null(tree)) tree <- new.tree(root)
   cat("attribute selected: ", attribute, "\n")
 
@@ -222,7 +225,7 @@ id3 <- function(examples, target, attributes, labels, tree) {
     branchId <- root$branches[[i]]
     # print(paste("branchId:",branchId))
     value <- as.character(VALUES[[attribute]][i])
-    print(paste("root is ", root$name, "value selected: ",value))
+    # print(paste("root is ", root$name, "value selected: ",value))
 
     #Subset of examples that have value vi for A
     Anumber <- which(attribute == colnames(examples)) #column number of attribute RECORDAR atribute es el elegido
@@ -245,16 +248,17 @@ id3 <- function(examples, target, attributes, labels, tree) {
       # ADD YOUR CODE HERE
       #
       ########
-      class <- most.common.value(examples,target)
+      class <- most.common.value(examples, target)
       leaf <- new.leaf(class)
-      tree <- add.subtree(tree,leaf,branchId)
+      
+      tree <- add.subtree(tree, leaf, branchId)
 
     } else {
 
       # <-- ES UNA MATRIX. Es un subconjunto de Examplesi (ver seudocÃ³digo en Mitchel.)
       exam <- NULL
       
-      exam <- examples[,-Anumber]
+      exam <- examplesi[,-Anumber]
       # print(paste("LABELS",length(labels)))
 
       subtree <- id3(exam, target, attributes[-Anumber], labels, NULL)
