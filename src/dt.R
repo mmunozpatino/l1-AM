@@ -1,13 +1,13 @@
 source("utils.R")
 
-deps <- c("read-matrix.R", "tree.R")
+  deps <- c("read-matrix.R", "tree.R")
 
-dependencies.loader(deps)
+  dependencies.loader(deps)
 
-VALUES <- list() # variable de acceso global
+  VALUES <- list() # variable de acceso global
 
-# Funcion auxiliar para el calculo entropia
-# Parametros: 
+  # Funcion auxiliar para el calculo entropia
+  # Parametros: 
 #   values: es un vector de valores de la "variable" 
 
 entropia <- function(p){
@@ -28,31 +28,24 @@ entropia <- function(p){
 
 
 # Elige el mejor atributo para clasificar los ejemplos en base a 'Information Gain'.
-#
-# Los parÃ¡metros son:
-#
-#     "examples" es el conjunto de ejemplos
-#
-#     "target" es un string con el nombre del atributo cuyo valor debe ser predecido por el Ã¡rbol
-# Return a string with the name of the best attribute to classify the examples.
-# Use la funcion "entropia" para el cÃ¡lculo de la misma
+  #
+  # Los parÃ¡metros son:
+  #
+  #     "examples" es el conjunto de ejemplos
+  #
+  #     "target" es un string con el nombre del atributo cuyo valor debe ser predecido por el Ã¡rbol
+  # Return a string with the name of the best attribute to classify the examples.
+  # Use la funcion "entropia" para el cÃ¡lculo de la misma
 
 best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE) {
   
-  best.att <- "" #guardarÃ¡ nombre del mejor atributo
-  
-  #######
-  #
-  # ADD YOUR CODE HERE
-  #
-  ########
+  best.att <- "" #guarda nombre del mejor atributo
   
   dataTarget <- examples[,target]
   labelsTarget <- unique(examples[,target])
   cantsTarget <- matrix(data = 0, nrow = length(labelsTarget), ncol=2)
-  
-  
-    #ver para muchos target!
+    
+  #ver para muchos target!
   # print("labelstargets!")
   # print(labelsTarget)
   cants.target.vector <- c()
@@ -134,14 +127,14 @@ best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE)
 }
 
 # Choose the most common value from a set of examples
-#
-# The parameters of this function are:
-#     "examples" are a set of example
-#
-#     "target" is a string with the name of attribute whose value is to be
-#     predicted by the tree.
-#
-# Return a string with the name of the best attribute to classify the examples.
+  #
+  # The parameters of this function are:
+  #     "examples" are a set of example
+  #
+  #     "target" is a string with the name of attribute whose value is to be
+  #     predicted by the tree.
+  #
+  # Return a string with the name of the best attribute to classify the examples.
 most.common.value <- function(examples, target) {
   
   value <- NULL
@@ -159,51 +152,52 @@ most.common.value <- function(examples, target) {
 }
 
 # Get the decision tree from a set of examples.
-#
-# The parameters of this function are:
-#
-# 	"examples" are the set of examples
-#
-# 	"target" is the attribute whose value is to be predicted by the tree
-#
-# 	"attributes" is a vector of other attributes that may be tested by the
-# 	learned decision tree.
-#
-#   "labels" is a vector with the labels to classify the "examples"
-#
-#   "tree" is data structure to save the decision tree
-#
-# Esta funciÃ³n regresa una lista con dos componentes: 'root', que es la variable nodo
-# obtenido de la iteraciÃ³n con id3, y 'tree' que es el Ã¡rbol construido.
-# subtree <- id3(exam, target, attributes[-Anumber], labels, NULL)
+  #
+  # The parameters of this function are:
+  #
+  # 	"examples" are the set of examples
+  #
+  # 	"target" is the attribute whose value is to be predicted by the tree
+  #
+  # 	"attributes" is a vector of other attributes that may be tested by the
+  # 	learned decision tree.
+  #
+  #   "labels" is a vector with the labels to classify the "examples"
+  #
+  #   "tree" is data structure to save the decision tree
+  #
+  # Esta funciÃ³n regresa una lista con dos componentes: 'root', que es la variable nodo
+  # obtenido de la iteraciÃ³n con id3, y 'tree' que es el Ã¡rbol construido.
+  # subtree <- id3(exam, target, attributes[-Anumber], labels, NULL)
 id3 <- function(examples, target, attributes, labels, tree) {
   
-  examples <- matrix(examples,ncol=(length(attributes)+1),
-                     dimnames=list(rownames=NULL,colnames=c(attributes,target)))
+  examples <- matrix(examples,
+                      ncol= (length(attributes)+1),
+                      dimnames=list(rownames= NULL, colnames= c(attributes,target))
+                    )
 
   #se crea una estructura vacia de nodo
   root <- NULL
 
-  # Â¿Tienen todos los ejemplos la misma etiqueta? 
+  # ¿Tienen todos los ejemplos la misma etiqueta? 
   for (i in 1:length(labels))
     if (all(examples[,target] == labels[i])) {
 
       class <- labels[i]
       root <- new.leaf(class)
 
-      # print(paste("leaf ", labels[i]))
-      
+      print(paste("leaf ", labels[i]))
 
       return(new.tree(root))
     }
 
-  # Â¿Se encuentra vacÃ???o el conjunto de los atributos?
+  # Se encuentra vacío el conjunto de los atributos?
   if (length(attributes)==0) {
 
     class <- most.common.value(examples, target)
     root <- new.leaf(class)
 
-    # print(paste("leaf ", root$label))
+    print(paste("leaf ", root$label))
 
     return(new.tree(root))
   }
@@ -272,15 +266,14 @@ id3 <- function(examples, target, attributes, labels, tree) {
 }
 
 # Classify an example from the tree model
-#
-# The parameters are
-#
-#	"tree" the tree model obtained with learn.tree()
-#	"example" one example to be classify
-#
-# Return the label for "example"
-classify.example <- function(tree=NULL, example=NULL) 
-{
+  #
+  # The parameters are
+  #
+  #	"tree" the tree model obtained with learn.tree()
+  #	"example" one example to be classify
+  #
+  # Return the label for "example"
+classify.example <- function(tree=NULL, example=NULL) {
   label <- NULL
   
   #######
@@ -293,28 +286,27 @@ classify.example <- function(tree=NULL, example=NULL)
 }
 
 # Realice todo el pre-procesamiento necesario de los datos en esta funciÃ³n.
-# En la funciÃ³n se encuentra el pre-procesamiento del dataset PlayTennis para que 
-# se obtengan estructuras necesarias para trabajar con ID3.
-# Modifique esta funciÃ³n para poder manipular distintos tipos de dataset 
-# (spam, restaurant,tennis)
-# De esta manera se le facilitarÃ¡ la carga de datos
-#
-# REGRESA: 
-# target.attribute: la etiqueta del atributo objetivo target 
-# labels: los valores posibles de clasificaciÃ³n
-# examples: matriz conjunto de ejemplos que serÃ¡n utilizados para clasificar el Ã¡rbol
-# attributes: vector listado de nombres de atributos
+  # En la funciÃ³n se encuentra el pre-procesamiento del dataset PlayTennis para que 
+  # se obtengan estructuras necesarias para trabajar con ID3.
+  # Modifique esta funciÃ³n para poder manipular distintos tipos de dataset 
+  # (spam, restaurant,tennis)
+  # De esta manera se le facilitarÃ¡ la carga de datos
+  #
+  # REGRESA: 
+  # target.attribute: la etiqueta del atributo objetivo target 
+  # labels: los valores posibles de clasificaciÃ³n
+  # examples: matriz conjunto de ejemplos que serÃ¡n utilizados para clasificar el Ã¡rbol
+  # attributes: vector listado de nombres de atributos
 
-load.data <- function(path.data="../data/",name="tennis.csv")
-{
+load.data <- function(path.data="../data/",name="tennis.csv"){
   #variables que debe completar, luego de cargar cada dataset
   target <- NULL
   labels <- NULL 
   examples<- NULL
   attributes <- NULL 
   
-  if(startsWith(name,"tennis"))
-  {
+  if(startsWith(name,"tennis"))  {
+    
     path <- paste(path.data,name,sep="")
     examples <- read.csv(path,header=TRUE, stringsAsFactors=FALSE)
     examples <- as.matrix(examples)
@@ -322,12 +314,12 @@ load.data <- function(path.data="../data/",name="tennis.csv")
     attributes <- attributes[-ncol(examples)] #quita la última columna, porque tiene los true o false
     etiquetas <- unique(examples[,ncol(examples)]) #obtenemos "no" y "yes", parametros para las etiquetas
     target <- (colnames(examples))[length(colnames(examples))] #devuleve playtennis
+    
     ## las siguientes lÃ???neas guardan por c/atributo sus correspondientes valores
     for (i in 1:length(attributes))
      VALUES[[attributes[i]]] <<- unique(examples[,attributes[i]]) # vector de vectores con los valores posibles por orden
   }
-  else if(startsWith(name,"restaurant"))
-  {
+  else if(startsWith(name,"restaurant")){
     path <- paste(path.data,name,sep="")
     examples <- read.csv(path,header=TRUE, stringsAsFactors=FALSE)
     examples <- as.matrix(examples)
@@ -336,12 +328,11 @@ load.data <- function(path.data="../data/",name="tennis.csv")
     etiquetas <- unique(examples[,ncol(examples)]) #obtenemos "no" y "yes", parametros para las etiquetas
     target <- (colnames(examples))[length(colnames(examples))] #devuleve playtennis
     ## las siguientes lineas guardan por c/atributo sus correspondientes valores
+    
     for (i in 1:length(attributes))
       VALUES[[attributes[i]]] <<- unique(examples[,attributes[i]])
-    
 
-  }else if(startsWith(name,"web_sample"))
-  {
+  }else if(startsWith(name,"web_sample")){
     path <- paste(path.data,name,sep="")
     examples <- read.csv(path,header=TRUE, stringsAsFactors=FALSE)
     examples <- as.matrix(examples)
@@ -357,8 +348,7 @@ load.data <- function(path.data="../data/",name="tennis.csv")
   return (list(target.attribute=target, labels = etiquetas, examples=examples,attributes=attributes))
 }
 
-run.tree.experiment <- function(name)
-{
+run.tree.experiment <- function(name){
   
   # 1- CARGA DE DATOS
   # path.data : donde se encuentra el directorio data de este laboratorio 1
@@ -367,11 +357,11 @@ run.tree.experiment <- function(name)
   dataset <- load.data(path.data="../data/",name) 
   ## Para ver los elementos de dataset, 
   ## descomente las siguientes lÃ???neas antes de ejecutar
-  print("target: ")
+  print("---Target:--------------------------------------------------------------------------")
   print(dataset$target.attribute)
-  print("labels: ")
+  print("---Labels:--------------------------------------------------------------------------")
   print(dataset$labels)
-  print("attributes: ")
+  print("---Attributes:----------------------------------------------------------------------")
   print(dataset$attributes)
 
   
