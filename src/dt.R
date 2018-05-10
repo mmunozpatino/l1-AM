@@ -236,12 +236,6 @@ id3 <- function(examples, target, attributes, labels, tree) {
 
     if (is.null(examplesi) | nrow(examplesi)==0){
       # Add a leaf node with label = most common value of target in examples
-  
-      #######
-      #
-      # ADD YOUR CODE HERE
-      #
-      ########
       class <- most.common.value(examples, target)
       leaf <- new.leaf(class)
       
@@ -255,7 +249,7 @@ id3 <- function(examples, target, attributes, labels, tree) {
       exam <- examplesi[,-Anumber]
       # print(paste("LABELS",length(labels)))
 
-      subtree <- id3(exam, target, attributes[-Anumber], labels, NULL)
+      subtree <- id3(exam, target, attribute[-Anumber], labels, NULL)
 
       tree <- add.subtree(tree,subtree,branchId)
     }
@@ -363,6 +357,7 @@ run.tree.experiment <- function(name){
   print(dataset$labels)
   print("---Attributes:----------------------------------------------------------------------")
   print(dataset$attributes)
+  print("------------------------------------------------------------------------------------ \n")
 
   
   # 2- CONSTRUCCIÃN DEL ÃRBOL USANDO ID3
