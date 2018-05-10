@@ -293,13 +293,13 @@ classify.example <- function(tree=NULL, example=NULL)
     
     # Itero en example hasta que coincida con la raiz
     for(i in 1:length(example)){
-      cat("este print",names(tree$nodes[[1]]$branches))
+      # cat("este print",names(tree$nodes[[1]]$branches))
       
       #any -> verifica si en un arreglo al menos alguno de los valores es verdadero. 
       
       #Si alguno de los valores del ejemplo está presente en alguna de las ramas del arbol
       if(any(example[i] == names(tree$nodes[[1]]$branches))){
-        
+        cat("tree nodes: ",example[i])
         #Guardo la variable del ejemplo que coincide con la raiz
         varExam <- example[which(any(example[i] == names(tree$nodes[[1]]$branches)))]
         break
