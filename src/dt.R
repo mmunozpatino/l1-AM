@@ -424,6 +424,9 @@ run.tree.experiment <- function(name){
   # (e.g example=c("v1","v2","valor3"))
   # El ejemplo dependerÃ¡ del dataset con el que estÃ© trabajando
   # Muestre en consola el ejemplo a clasificar y el resultado.
-  classify.example(tree=result, example=NULL) 
+
+  ej1 <- c("$","$$","$$$")
+
+  classify.example(tree=result, example= ej1) 
 
 }
