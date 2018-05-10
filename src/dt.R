@@ -180,94 +180,99 @@ id3 <- function(examples, target, attributes, labels, tree) {
   
   examples <- matrix(examples,ncol=(length(attributes)+1),
                      dimnames=list(rownames=NULL,colnames=c(attributes,target)))
-
+  
   #se crea una estructura vacia de nodo
   root <- NULL
-
-  # Â¿Tienen todos los ejemplos la misma etiqueta? 
+  
+  # ¿Tienen todos los ejemplos la misma etiqueta? 
   for (i in 1:length(labels))
     if (all(examples[,target] == labels[i])) {
-
+      
       class <- labels[i]
       root <- new.leaf(class)
-
-      # print(paste("leaf ", labels[i]))
       
-
+      print(paste("leaf ", labels[i]))
+      
+      
       return(new.tree(root))
     }
-
-  # Â¿Se encuentra vacÃ???o el conjunto de los atributos?
+  
+  # ¿Se encuentra vac�?o el conjunto de los atributos?
   if (length(attributes)==0) {
-
+    
     class <- most.common.value(examples, target)
     root <- new.leaf(class)
-
-    # print(paste("leaf ", root$label))
-
+    
+    print(paste("leaf ", root$label))
+    
     return(new.tree(root))
   }
-
+  
   attribute <- best.attribute(examples, attributes, target, labels)
   
-  # print(paste("mejor atributo:",attribute))
-
+  
   root <- new.node(attribute, VALUES[[attribute]])
   
-  # print(root)
-  if (is.null(tree)) tree <- new.tree(root)
-  # cat("attribute selected: ", attribute, "\n")
-
-  # print(paste("values:",VALUES[[attribute]]))
-  for (i in 1:length(VALUES[[attribute]])){
-    ## FOR POR CADA VALOR "atributo" DEL SELECCIONADO (ejemplo sunny,rain,overcast) 
+  if (is.null(tree)) tree <- new.tree(root) #Si el arbol esta vacio agrego la raiz
+  cat("attribute selected: ", attribute, "\n")
+  #print(root)
+  
+  #Va a recorrer cada valor de cada atributo -> por ejemplo para Outlook "Sunny", Overcast y Rain
+  for (i in 1:length(VALUES[[attribute]])){  
+    
     #Add a new tree branch below Root, corresponding to the test A = vi
-    branchId <- root$branches[[i]]
-    # print(paste("branchId:",branchId))
+    branchId <- root$branches[[i]] 
+    
+    #Selecciona el primer valor que puede tomar la variable
     value <- as.character(VALUES[[attribute]][i])
-    # print(paste("root is ", root$name, "value selected: ",value))
-
+    print(paste("root is ", root$name, "value selected: ",value))
+    
+    
     #Subset of examples that have value vi for A
-    Anumber <- which(attribute == colnames(examples)) #column number of attribute RECORDAR atribute es el elegido
-    # print(paste("Anumber:",Anumber))
-    fila <- which(examples[,Anumber]==value)
-    # print(paste("fila:",fila))
-    examplesi <- examples[fila,] #tomo las filas que tiene sunny
-    # print(paste("examplesi:",examples[fila,])) 
-    # print(length(examplesi))
+    Anumber <- which(attribute == colnames(examples)) #column number of attribute
+    #print(Anumber)
+    
+    fila <- which(examples[,Anumber]==value) #indices de las filas que son el valor del atributo analizado
+    #print(fila)
+    
+    examplesi <- examples[fila,] #deja todas las filas del valor del atributo completas
+    # print(examplesi)
+    
     #examplesi as 1 row?
     if(length(examplesi)==(length(attributes)+1)){
       examplesi <- matrix(examplesi,ncol=(length(attributes)+1),dimnames=list(rownames=NULL,colnames=c(attributes,target)))
     }
-
+    
     if (is.null(examplesi) | nrow(examplesi)==0){
       # Add a leaf node with label = most common value of target in examples
-  
+      
       #######
-      #
-      # ADD YOUR CODE HERE
-      #
-      ########
+      
       class <- most.common.value(examples, target)
       leaf <- new.leaf(class)
       
       tree <- add.subtree(tree, leaf, branchId)
-
+      
+      ########
+      
     } else {
-
-      # <-- ES UNA MATRIX. Es un subconjunto de Examplesi (ver seudocÃ³digo en Mitchel.)
+      
+      # <-- ES UNA MATRIX. Es un subconjunto de Examplesi (ver seudocódigo en Mitchel.)
       exam <- NULL
       
+      #######
+      
       exam <- examplesi[,-Anumber]
-      # print(paste("LABELS",length(labels)))
-
-      subtree <- id3(exam, target, attributes[-Anumber], labels, NULL)
-
+      
+      ########
+      
+      subtree <- id3(exam, target, attribute[-Anumber], labels, NULL)
+      
       tree <- add.subtree(tree,subtree,branchId)
-    }
-
-  }
-
+    }    
+    
+  }  
+  
   return(tree)
 }
 
@@ -439,6 +444,6 @@ run.tree.experiment <- function(name)
   # El ejemplo dependerÃ¡ del dataset con el que estÃ© trabajando
   # Muestre en consola el ejemplo a clasificar y el resultado.
   example <- c("Overcast","Mild","Normal","Strong")
-  classify.example(tree=result, example=example) 
+  classify.example(tree=result, example=example)
 
 }
