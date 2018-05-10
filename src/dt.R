@@ -186,7 +186,7 @@ id3 <- function(examples, target, attributes, labels, tree) {
       return(new.tree(root))
     }
   
-  # Â¿Se encuentra vacÃ?o el conjunto de los atributos?
+  # Â¿Se encuentra vacï¿½?o el conjunto de los atributos?
   if (length(attributes)==0) {
     
     class <- most.common.value(examples, target)
@@ -280,7 +280,7 @@ classify.example <- function(tree=NULL, example=NULL)
   #######
   parent <- NULL
   
-  if(is.null(parent)){ #Es la raíz?
+  if(is.null(parent)){ #Es la raï¿½z?
     
     varExam <- NULL
     
@@ -290,7 +290,7 @@ classify.example <- function(tree=NULL, example=NULL)
       
       #any -> verifica si en un arreglo al menos alguno de los valores es verdadero. 
       
-      #Si alguno de los valores del ejemplo está presente en alguna de las ramas del arbol
+      #Si alguno de los valores del ejemplo estï¿½ presente en alguna de las ramas del arbol
       if(any(example[i] == names(tree$nodes[[1]]$branches))){
         
         #Guardo la variable del ejemplo que coincide con la raiz
@@ -308,7 +308,7 @@ classify.example <- function(tree=NULL, example=NULL)
   # Itero sobre los nodos del arbol
   for(f in 2:tree$nodesCount){
     
-    # Es la raíz del subasrbol?
+    # Es la raï¿½z del subasrbol?
     if(tree$nodes[[f]]$parentId == parent){
       
       # Es una hoja?
@@ -366,10 +366,10 @@ load.data <- function(path.data="../data/",name="tennis.csv")
     examples <- read.csv(path,header=TRUE, stringsAsFactors=FALSE)
     examples <- as.matrix(examples)
     attributes <- as.vector(dimnames(examples)[[2]])
-    attributes <- attributes[-ncol(examples)] #quita la última columna, porque tiene los true o false
+    attributes <- attributes[-ncol(examples)] #quita la ï¿½ltima columna, porque tiene los true o false
     etiquetas <- unique(examples[,ncol(examples)]) #obtenemos "no" y "yes", parametros para las etiquetas
     target <- (colnames(examples))[length(colnames(examples))] #devuleve playtennis
-    ## las siguientes lÃ?neas guardan por c/atributo sus correspondientes valores
+    ## las siguientes lï¿½?neas guardan por c/atributo sus correspondientes valores
     for (i in 1:length(attributes))
       VALUES[[attributes[i]]] <<- unique(examples[,attributes[i]]) # vector de vectores con los valores posibles por orden
   }
@@ -379,7 +379,7 @@ load.data <- function(path.data="../data/",name="tennis.csv")
     examples <- read.csv(path,header=TRUE, stringsAsFactors=FALSE)
     examples <- as.matrix(examples)
     attributes <- as.vector(dimnames(examples)[[2]])
-    attributes <- attributes[-ncol(examples)] #quita la última columna, porque tiene los true o false
+    attributes <- attributes[-ncol(examples)] #quita la ï¿½ltima columna, porque tiene los true o false
     etiquetas <- unique(examples[,ncol(examples)]) #obtenemos "no" y "yes", parametros para las etiquetas
     target <- (colnames(examples))[length(colnames(examples))] #devuleve playtennis
     ## las siguientes lineas guardan por c/atributo sus correspondientes valores
@@ -393,15 +393,30 @@ load.data <- function(path.data="../data/",name="tennis.csv")
     examples <- read.csv(path,header=TRUE, stringsAsFactors=FALSE)
     examples <- as.matrix(examples)
     attributes <- as.vector(dimnames(examples)[[2]])
-    attributes <- attributes[-ncol(examples)] #quita la última columna, porque tiene los true o false
+    attributes <- attributes[-ncol(examples)] #quita la ï¿½ltima columna, porque tiene los true o false
     etiquetas <- unique(examples[,ncol(examples)]) #obtenemos "no" y "yes", parametros para las etiquetas
     target <- (colnames(examples))[length(colnames(examples))] #devuleve playtennis
     ## las siguientes lineas guardan por c/atributo sus correspondientes valores
     for (i in 1:length(attributes))
       VALUES[[attributes[i]]] <<- unique(examples[,attributes[i]])
     
+  }else if(startsWith(name,"SPAM")){
+    print("llego")
+    source("read-matrix.R") 
+    examples <- read_matrix(filename="../data/MATRIX.TRAIN",ocurrence=FALSE,sparse=FALSE) 
+    # attributes <- as.vector(dimnames(examples))
+    attributes <- examples$tokens
+    attributes <- attributes[-examples$matrix$category]
+    print(paste("ncol:",examples$matrix$category))
+    # Acceso a componetes: m.train$tokens y m.train$matrix
+    # tokens <- m.train$tokensrun
+    # trainset <- m.train$matrix
+    # names(trainset) <- c(m.train$tokens,"category")
+    # print(paste("m.train:", m.train)) #NO EJECUTAR
+    
   }else stop("ERROR Debe brindar un dataset. Verifique argumentos path.data y name")
-  return (list(target.attribute=target, labels = etiquetas, examples=examples,attributes=attributes))
+  # return (list(target.attribute=target, labels = etiquetas, examples=examples,attributes=attributes))
+  return(NULL)
 }
 
 run.tree.experiment <- function(name)
@@ -413,7 +428,7 @@ run.tree.experiment <- function(name)
   # COMPLETO
   dataset <- load.data(path.data="../data/",name) 
   ## Para ver los elementos de dataset, 
-  ## descomente las siguientes lÃ?neas antes de ejecutar
+  ## descomente las siguientes lï¿½?neas antes de ejecutar
   print("target: ")
   print(dataset$target.attribute)
   print("labels: ")
