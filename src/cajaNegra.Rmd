@@ -1,8 +1,6 @@
 ---
 title: 'AM - Laboratorio I: Caja negra'
-output:
-  html_document:
-    df_print: paged
+output:pdf_document
 ---
 
 
@@ -68,25 +66,14 @@ La funcion ggplot() crea un sistema de coordenadas en donde es posible agregar n
 ```{r}
 # quizas sea necesario instalar el paquete
 # install.packages("ggplot2")
-spam <- 0
-nospam <- 0
+nspan<- which(m.train$matrix$category == "SPAM")
+print(length(nspan))
 
-  spam <- length(which(m.train$matrix$category=="SPAM"))
+pSpan <- length(nspan)/nrow(m.train$matrix)
 
-  nospam <- length(which(m.train$matrix$category=="NO-SPAM"))
-
-
-distspam<-(spam/nrow(m.train$matrix))*100
-distnospam <- (nospam/nrow(m.train$matrix))*100
-distribucion = c(distspam, distnospam)
-categorias <- c("spam", "no-spam")
-distdata = data.frame(distribucion, categorias)
-
-library(ggplot2)
-ggplot(data= distdata, aes(x=distdata$categorias, y=distdata$distribucion, fill="red")) + geom_bar(stat="identity")+ ggtitle("Distribuci�n de clases") + labs(x="Categorias", y ="Distribuci�n(%)") 
-
-
-
+ggplot(data=trainset)+
+  geom_bar(aes(x = 1, y = pSpan ), alpha = 0.3, color = "red" )+
+  geom_bar(aes(x = 2, y = (1-pSpan) ))
 # en este caso estamos usando las propiedades visuales x y fill (relleno) 
 
 ```
@@ -96,22 +83,37 @@ ggplot(data= distdata, aes(x=distdata$categorias, y=distdata$distribucion, fill=
 ```{r}
 #INSERTAR CODIGO AQUI
 
-# matriz <- trainset[1:(ncol(m.train$matrix)-1)]
-# rdo <- sort(colSums(matriz), decreasing = TRUE)
-rdospam <- trainset[which(m.train$matrix$category == "SPAM"), 1:(ncol(m.train$matrix)-1)]
-cantrepetespam <- sort(colSums(rdospam), decreasing = TRUE)
-rdoNospam <- trainset[which(m.train$matrix$category == "NO-SPAM"), 1:(ncol(m.train$matrix)-1)]
-cantrepetNoSpam <- sort(colSums(rdoNospam), decreasing = TRUE)
+names(m.train$matrix)<- names(trainset)
 
-grafspam <- data.frame(names(cantrepetespam)[1:7], cantrepetespam[1:7])
-grafnospam <- data.frame(names(cantrepetNoSpam)[1:7], cantrepetNoSpam[1:7])
-ggplot(data= grafspam) + 
-  geom_bar(aes(x=grafspam$names.cantrepetespam., y= grafspam$cantrepetespam), stat="identity", fill="red",alpha=0.3) + 
-  ggtitle("Distribuci�n") + 
-  labs(x="Palabra",y="Frecuencia")+
-  geom_bar(aes(x=grafnospam$names.cantrepetNoSpam., y= grafnospam$cantrepetNoSpam), stat="identity", fill="blue",alpha=0.3)
+spam<- subset(m.train$matrix, category == "SPAM")
+noSpam<- subset(m.train$matrix, category == "NO-SPAM")
+
+matrixSpam <- colSums(spam[1:(ncol(trainset)-1)] )
+matrixNoSpam <- colSums(noSpam[1:(ncol(trainset)-1)] )
+
+matrixSumaTotal <- colSums(m.train$matrix[1:(ncol(trainset)-1)] )
+
+matrix <- data.frame(spam = matrixSpam, noSpam = matrixNoSpam, suma = matrixSumaTotal)
+
+
+
+matrix <- matrix[order(matrix$suma,decreasing = TRUE),]
+
+graphSet <- matrix[1:10,]
+names <- row.names(graphSet)
+
+# View(names)
+ggplot(data= graphSet) + 
+  geom_bar(aes(x = names, y= graphSet$noSpam), stat="identity", fill="red", alpha=0.3, color="red")+
+  geom_bar(aes(x = names, y= -(graphSet$spam)), stat="identity", fill="blue", alpha=0.3, color="blue")+
+  ggtitle('Mails')+
+  labs(x="palabra", y = "")
 
 ```
+
+
+
+
 
 ### Punto (A) 
 Vamos a utilizar árboles de decisión para aprender un clasificador de spam usando la matriz
@@ -126,7 +128,7 @@ CORRECT. Puede guiarse mediante el siguiente código y además consultar la ayud
 library("rpart")
 library("rpart.plot")
 tree.model <- rpart(formula=category~.,data=trainset)
-# prp(tree.model)
+prp(tree.model)
 colCategory <- ncol(trainset)
 m.pred <- predict(tree.model, trainset[-colCategory])
 aux.pred <- as.matrix(m.pred[,1])
@@ -135,7 +137,6 @@ aux.pred[aux.pred<0.5] <- "NO-SPAM"
 aux.true <- trainset[colCategory]
 result <- cbind(aux.true,aux.pred,aux.true==aux.pred)
 names(result) <- c("TRUE-VALUE", "PREDICTION", "CORRECT?")
-print(result)
 ```
 
 ### Punto (B) 
@@ -152,11 +153,10 @@ Ahora haremos uso del vector ```m.train$tokens``` para averiguar los índices de
 resultante volveremos a entrenar nuestro clasificador repitiendo los ejercicios (A) y (B).
 
 ```{r}
-index.cut <- (1:length(tokens))[tokens=="spam"|tokens=="httpaddr"|tokens=="news"] #devuelve los index de las palabras buscadas
-trainset.cut <- trainset[-index.cut] ##deja el trainset sin las palabras buscadas en la linea anterior
+index.cut <- (1:length(tokens))[tokens=="spam"|tokens=="httpaddr"|tokens=="news"]
+trainset.cut <- trainset[-index.cut]
 tree.model.cut <- rpart(formula=category~.,data=trainset.cut)
 prp(tree.model.cut)
-# print(trainset.cut)
 ```
 
 ### Punto (D) 
