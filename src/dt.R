@@ -403,11 +403,15 @@ load.data <- function(path.data="../data/",name="tennis.csv")
   }else if(startsWith(name,"SPAM")){
     print("llego")
     source("read-matrix.R") 
-    examples <- read_matrix(filename="../data/MATRIX.TRAIN",ocurrence=FALSE,sparse=FALSE) 
-    # attributes <- as.vector(dimnames(examples))
-    attributes <- examples$tokens
-    attributes <- attributes[-examples$matrix$category]
-    print(paste("ncol:",examples$matrix$category))
+    examples <- read_matrix(filename="../data/MATRIX.TRAIN.50",ocurrence=FALSE,sparse=FALSE) 
+    examples <- as.matrix(examples$matrix)
+    attributes <- as.vector(dimnames(examples)[[2]])
+    attributes <- attributes[-ncol(examples)] #quita la �ltima columna, porque tiene los true o false
+    etiquetas <- unique(examples[,ncol(examples)]) #obtenemos "no" y "yes", parametros para las etiquetas
+    target <- (colnames(examples))[length(colnames(examples))] #devuleve playtennis
+    ## las siguientes lineas guardan por c/atributo sus correspondientes valores
+    for (i in 1:length(attributes))
+      VALUES[[attributes[i]]] <<- unique(examples[,attributes[i]])
     # Acceso a componetes: m.train$tokens y m.train$matrix
     # tokens <- m.train$tokensrun
     # trainset <- m.train$matrix
@@ -415,8 +419,7 @@ load.data <- function(path.data="../data/",name="tennis.csv")
     # print(paste("m.train:", m.train)) #NO EJECUTAR
     
   }else stop("ERROR Debe brindar un dataset. Verifique argumentos path.data y name")
-  # return (list(target.attribute=target, labels = etiquetas, examples=examples,attributes=attributes))
-  return(NULL)
+  return (list(target.attribute=target, labels = etiquetas, examples=examples,attributes=attributes))
 }
 
 run.tree.experiment <- function(name)
