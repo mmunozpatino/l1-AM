@@ -60,7 +60,7 @@ best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE)
     cants[i,2] <- length(which(examples[,target] == labelsTarget[i]))
   }
   entropia.target <- entropia(as.numeric(cants[,2]))
-  print(entropia.target)
+  # print(entropia.target)
   
   gain.matrix <- matrix(data=0, nrow=length(attributes),ncol =2)
   
@@ -115,7 +115,7 @@ best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE)
   
   ########
   # Mostrar nombre del mejor atributo best.att y su valor de ganancia (gan)
-  print(c('mejor attributo:',best.att,gan))
+  # print(c('mejor attributo:',best.att,gan))
   
   return(best.att)
 }
@@ -180,7 +180,7 @@ id3 <- function(examples, target, attributes, labels, tree) {
       class <- labels[i]
       root <- new.leaf(class)
       
-      print(paste("leaf ", labels[i]))
+      # print(paste("leaf ", labels[i]))
       
       
       return(new.tree(root))
@@ -203,7 +203,7 @@ id3 <- function(examples, target, attributes, labels, tree) {
   root <- new.node(attribute, VALUES[[attribute]])
   
   if (is.null(tree)) tree <- new.tree(root) #Si el arbol esta vacio agrego la raiz
-  cat("attribute selected: ", attribute, "\n")
+  # cat("attribute selected: ", attribute, "\n")
   #print(root)
   
   #Va a recorrer cada valor de cada atributo -> por ejemplo para Outlook "Sunny", Overcast y Rain
