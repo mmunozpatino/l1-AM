@@ -401,7 +401,18 @@ load.data <- function(path.data="../data/",name="tennis.csv")
     for (i in 1:length(attributes))
       VALUES[[attributes[i]]] <<- unique(examples[,attributes[i]])
 
-  }else stop("ERROR Debe brindar un dataset. Verifique argumentos path.data y name")
+  }else if(startsWith(name,"spam")){
+    source("read-matrix.R") 
+    m.train <- read_matrix(filename="../data/MATRIX.TRAIN.50",ocurrence=FALSE,sparse=FALSE)
+    examples <- as.matrix(m.train$matrix)
+    attributes <- as.vector(dimnames(examples)[[2]])
+    attributes <- attributes[-ncol(examples)]
+    etiquetas <- unique(examples[,ncol(examples)])
+    target <- (colnames(examples))[length(colnames(examples))]
+    for(i in 1:length(attributes))
+      VALUES[[attributes[i]]] <<- unique(examples[,attributes[i]])
+  }
+  else stop("ERROR Debe brindar un dataset. Verifique argumentos path.data y name")
   return (list(target.attribute=target, labels = etiquetas, examples=examples,attributes=attributes))
 }
 
@@ -434,12 +445,23 @@ run.tree.experiment <- function(name)
   # El ejemplo dependerá del dataset con el que esté trabajando
   # Muestre en consola el ejemplo a clasificar y el resultado.
   
+  #Ejemplos para Weather
+  
   # example <- c("Rain","Mild","Normal","Strong")
   # example <- c("Rain","Mild","High","Strong")
   # example <- c("Sunny","Mild","Normal","Strong")
-  # example <- c("Sunny","Mild","High","Strong")
+   # example <- c("Sunny","Mild","High","Strong")
   example <- c("Overcast","Mild","Normal","Strong")
   
-  classify.example(tree=result, example=example) 
+  #Ejemplo Restaurant
+  
+  # example<- c("Algunos","Si","Si","$$")
+   # example<- c("Algunos","Si","Si","$$")
+   # example<- c("Ninguno", "No", "Si", "$$$")
+   # example <- c("Lleno","Si","Si","$")
+  
+  
+  #classify.example(tree=result, example=example) 
+  
 
 }
