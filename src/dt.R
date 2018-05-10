@@ -216,7 +216,7 @@ id3 <- function(examples, target, attributes, labels, tree) {
   
   # print(root)
   if (is.null(tree)) tree <- new.tree(root)
-  cat("attribute selected: ", attribute, "\n")
+  # cat("attribute selected: ", attribute, "\n")
 
   # print(paste("values:",VALUES[[attribute]]))
   for (i in 1:length(VALUES[[attribute]])){
@@ -281,14 +281,67 @@ id3 <- function(examples, target, attributes, labels, tree) {
 # Return the label for "example"
 classify.example <- function(tree=NULL, example=NULL) 
 {
+  
   label <- NULL
   
   #######
-  #
-  # ADD YOUR CODE HERE
-  #
-  ########
+  parent <- NULL
   
+  if(is.null(parent)){ #Es la ra�z?
+    
+    varExam <- NULL
+    
+    # Itero en example hasta que coincida con la raiz
+    for(i in 1:length(example)){
+      cat("este print",names(tree$nodes[[1]]$branches))
+      
+      #any -> verifica si en un arreglo al menos alguno de los valores es verdadero. 
+      
+      #Si alguno de los valores del ejemplo est� presente en alguna de las ramas del arbol
+      if(any(example[i] == names(tree$nodes[[1]]$branches))){
+        
+        #Guardo la variable del ejemplo que coincide con la raiz
+        varExam <- example[which(any(example[i] == names(tree$nodes[[1]]$branches)))]
+        break
+      }
+    }
+    
+    #Guardo el parentId de la raiz
+    parent <- tree$nodes[[1]]$branches[which(names(tree$nodes[[1]]$branches) == varExam)]
+    
+  }
+  
+  # Si no es la raiz tengo que recorrer el resto del arbol
+  # Itero sobre los nodos del arbol
+  for(f in 2:tree$nodesCount){
+    
+    # Es la ra�z del subasrbol?
+    if(tree$nodes[[f]]$parentId == parent){
+      
+      # Es una hoja?
+      if(!is.null(tree$nodes[[f]]$label)){
+        print(paste("Resultado: ", tree$nodes[[f]]$label))
+        label <- tree$nodes[[f]]$label
+        break
+      }
+      
+      # No es una hoja, es un branch
+      # Determino por cual nodo debo seguir recorriendo
+      
+      for(i in 1:length(example)){
+        # Verifico si algun valor del ejemplo se corresponde con algun branch para seguir recorriendo
+        if(any(names(tree$nodes[[f]]$branches) == example[i])){
+          
+          #Guardo el parentId
+          parent <- tree$nodes[[f]]$branches[which(example[i] == names(tree$nodes[[f]]$branches))] 
+          break
+        }
+      }
+      print(label)
+      
+    }
+  }
+  ########
   return(label)
 }
 
@@ -380,12 +433,12 @@ run.tree.experiment <- function(name)
   
   # La funciÃ³n plot.tree permite ver el Ã¡rbol graficado
   plot.tree(result)
-  
   # 3- CLASIFICAR un nuevo ejemplo
   # Complete el argumento example con el nuevo ejemplo a clasificar 
   # (e.g example=c("v1","v2","valor3"))
   # El ejemplo dependerÃ¡ del dataset con el que estÃ© trabajando
   # Muestre en consola el ejemplo a clasificar y el resultado.
-  classify.example(tree=result, example=NULL) 
+  example <- c("Overcast","Mild","Normal","Strong")
+  classify.example(tree=result, example=example) 
 
 }
