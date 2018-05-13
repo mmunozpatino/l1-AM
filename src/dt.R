@@ -366,8 +366,10 @@ load.data <- function(path.data="../data/",name="tennis.csv")
     path <- paste(path.data,name,sep="")
     examples <- read.csv(path,header=TRUE, stringsAsFactors=FALSE)
     examples <- as.matrix(examples)
+    View(examples)
     attributes <- as.vector(dimnames(examples)[[2]])
     attributes <- attributes[-ncol(examples)] #quita la última columna, porque tiene los true o false
+    View(attributes)
     etiquetas <- unique(examples[,ncol(examples)]) #obtenemos "no" y "yes", parametros para las etiquetas
     target <- (colnames(examples))[length(colnames(examples))] #devuleve playtennis
     ## las siguientes lÃ?neas guardan por c/atributo sus correspondientes valores
@@ -404,9 +406,15 @@ load.data <- function(path.data="../data/",name="tennis.csv")
   }else if(startsWith(name,"spam")){
     source("read-matrix.R") 
     m.train <- read_matrix(filename="../data/MATRIX.TRAIN.50",ocurrence=FALSE,sparse=FALSE)
+    View(m.train)
     examples <- as.matrix(m.train$matrix)
+    for(j in 1:(ncol(examples)-1)){
+      dimnames(examples)[[2]][j] <- m.train$tokens[j]
+    }
+    View(examples)
     attributes <- as.vector(dimnames(examples)[[2]])
     attributes <- attributes[-ncol(examples)]
+    View(attributes)
     etiquetas <- unique(examples[,ncol(examples)])
     target <- (colnames(examples))[length(colnames(examples))]
     for(i in 1:length(attributes))
