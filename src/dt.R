@@ -460,6 +460,8 @@ run.tree.experiment <- function(name)
   # example <- c("Sunny","Mild","Normal","Strong")
    # example <- c("Sunny","Mild","High","Strong")
   example <- c("Overcast","Mild","Normal","Strong")
+  print("Example:")
+  print(example)
   
   #Ejemplo Restaurant
   
@@ -468,8 +470,8 @@ run.tree.experiment <- function(name)
    # example<- c("Ninguno", "No", "Si", "$$$")
    # example <- c("Lleno","Si","Si","$")
   
-  
-  #classify.example(tree=result, example=example) 
-  
+  if(!(name=="spam")){
+    classify.example(tree=result, example=example)
+  }
 
 }
