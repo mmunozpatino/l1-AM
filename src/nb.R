@@ -79,9 +79,9 @@ naiveBayesModel <- function(examples,
   for (att in attributes){ # <--- por cada atributo
     for (class in labels){ # <--- por cada etiqueta de clasificación
       for(value in colnames(model[[att]])){ # <--- por cada valor que puede tomar ese atributo
-        print(att)
-        print(class)
-        print(value)
+        # print(att)
+        # print(class)
+        # print(value)
         
         
         f_cond <- 0
@@ -90,13 +90,13 @@ naiveBayesModel <- function(examples,
         # setee el valor en la variable f_cond  
         #######
         
-        cant.value <- length(which(examples[,att]==value))
-        f_cond<- sum(examples[which(examples[,att]==value),target.attribute]==class)/cant.value
-        print(f_cond)
+        # cant.value <- length(which(examples[,att]==value))
+        f_cond<- sum(examples[which(examples[,att]==value),target.attribute]==class)
+        # print(f_cond)
         
         ########
-        
         # Aplicar la Corrección de Laplace, para que los valores "cero" no den problemas.
+        #Si queda 0 al multiplicarlo la probabilidad va a dar 0. 
         f_cond <- f_cond + laplace
         
         # Guardo el valor en mi tabla
@@ -110,11 +110,15 @@ naiveBayesModel <- function(examples,
     # Diríjase al libro, para entender este concepto o a los apuntes.
     
     for(class in labels){
-      
+   
       #######
-      #
-      # ADD YOUR CODE HERE
-      #
+      total.class <- sum(model[[att]][class,])
+      # print("ACA")
+      # print(total.class)
+      
+      for(value in colnames(model[[att]])){
+        model[[att]][class,value] <- model[[att]][class,value]/total.class
+      }
       ########
     }
   }
@@ -252,7 +256,7 @@ run.nb.experiment <- function(name)
 			      labels = dataset$labels,
             laplace=1)
   
-  print(nb.model$apriori)
+  print(nb.model)
   
   # 3- CLASIFICAR un nuevo ejemplo
   # Complete el argumento example con el nuevo ejemplo a clasificar (e.g: my_example <- c("Overcast","Cold","Normal","Weak"))
