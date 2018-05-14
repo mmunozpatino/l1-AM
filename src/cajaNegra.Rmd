@@ -1,6 +1,8 @@
 ---
 title: 'AM - Laboratorio I: Caja negra'
-output:pdf_document
+output:
+  html_document:
+    df_print: paged
 ---
 
 
@@ -66,14 +68,23 @@ La funcion ggplot() crea un sistema de coordenadas en donde es posible agregar n
 ```{r}
 # quizas sea necesario instalar el paquete
 # install.packages("ggplot2")
-nspan<- which(m.train$matrix$category == "SPAM")
-print(length(nspan))
+spam <- 0
+nospam <- 0
 
-pSpan <- length(nspan)/nrow(m.train$matrix)
+spam <- length(which(m.train$matrix$category=="SPAM"))
+nospam <- length(which(m.train$matrix$category=="NO-SPAM"))
 
-ggplot(data=trainset)+
-  geom_bar(aes(x = 1, y = pSpan ), alpha = 0.3, color = "red" )+
-  geom_bar(aes(x = 2, y = (1-pSpan) ))
+
+spam<-(spam/nrow(m.train$matrix))*100
+nospam <- (nospam/nrow(m.train$matrix))*100
+
+ggplot(data= distdata, aes(x= c("spam", "no-spam"), y= c(spam, nospam) ,fill="red")) + 
+  geom_bar(stat="identity")  +
+  ggtitle("Distribuci?n de clases") +
+  labs(x="Categorias", y ="Distribuci?n(%)") 
+
+
+
 # en este caso estamos usando las propiedades visuales x y fill (relleno) 
 
 ```
@@ -104,16 +115,12 @@ names <- row.names(graphSet)
 
 # View(names)
 ggplot(data= graphSet) + 
-  geom_bar(aes(x = names, y= graphSet$noSpam), stat="identity", fill="red", alpha=0.3, color="red")+
-  geom_bar(aes(x = names, y= -(graphSet$spam)), stat="identity", fill="blue", alpha=0.3, color="blue")+
+  geom_bar(aes(x = names, y= graphSet$noSpam), stat="identity", fill="#00AA33")+
+  geom_bar(aes(x = names, y= -(graphSet$spam)), stat="identity", fill="#AA0033")+
   ggtitle('Mails')+
-  labs(x="palabra", y = "")
+  labs(x="Frases", y = "Cantidad")
 
 ```
-
-
-
-
 
 ### Punto (A) 
 Vamos a utilizar árboles de decisión para aprender un clasificador de spam usando la matriz
@@ -128,7 +135,7 @@ CORRECT. Puede guiarse mediante el siguiente código y además consultar la ayud
 library("rpart")
 library("rpart.plot")
 tree.model <- rpart(formula=category~.,data=trainset)
-prp(tree.model)
+# prp(tree.model)
 colCategory <- ncol(trainset)
 m.pred <- predict(tree.model, trainset[-colCategory])
 aux.pred <- as.matrix(m.pred[,1])
@@ -137,6 +144,7 @@ aux.pred[aux.pred<0.5] <- "NO-SPAM"
 aux.true <- trainset[colCategory]
 result <- cbind(aux.true,aux.pred,aux.true==aux.pred)
 names(result) <- c("TRUE-VALUE", "PREDICTION", "CORRECT?")
+print(result)
 ```
 
 ### Punto (B) 
@@ -153,10 +161,11 @@ Ahora haremos uso del vector ```m.train$tokens``` para averiguar los índices de
 resultante volveremos a entrenar nuestro clasificador repitiendo los ejercicios (A) y (B).
 
 ```{r}
-index.cut <- (1:length(tokens))[tokens=="spam"|tokens=="httpaddr"|tokens=="news"]
-trainset.cut <- trainset[-index.cut]
+index.cut <- (1:length(tokens))[tokens=="spam"|tokens=="httpaddr"|tokens=="news"] #devuelve los index de las palabras buscadas
+trainset.cut <- trainset[-index.cut] ##deja el trainset sin las palabras buscadas en la linea anterior
 tree.model.cut <- rpart(formula=category~.,data=trainset.cut)
 prp(tree.model.cut)
+# print(trainset.cut)
 ```
 
 ### Punto (D) 

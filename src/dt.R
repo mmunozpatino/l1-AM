@@ -33,16 +33,15 @@ entropia <- function(values){
   
 }
 
-
 # Elige el mejor atributo para clasificar los ejemplos en base a 'Information Gain'.
-#
-# Los parámetros son:
-#
-#     "examples" es el conjunto de ejemplos
-#
-#     "target" es un string con el nombre del atributo cuyo valor debe ser predecido por el árbol
-# Return a string with the name of the best attribute to classify the examples.
-# Use la funcion "entropia" para el cálculo de la misma
+  #
+  # Los parámetros son:
+  #
+  #     "examples" es el conjunto de ejemplos
+  #
+  #     "target" es un string con el nombre del atributo cuyo valor debe ser predecido por el árbol
+  # Return a string with the name of the best attribute to classify the examples.
+  # Use la funcion "entropia" para el cálculo de la misma
 
 best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE) {
   
@@ -120,16 +119,15 @@ best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE)
   return(best.att)
 }
 
-
 # Choose the most common value from a set of examples
-#
-# The parameters of this function are:
-#     "examples" are a set of example
-#
-#     "target" is a string with the name of attribute whose value is to be
-#     predicted by the tree.
-#
-# Return a string with the name of the best attribute to classify the examples.
+  #
+  # The parameters of this function are:
+  #     "examples" are a set of example
+  #
+  #     "target" is a string with the name of attribute whose value is to be
+  #     predicted by the tree.
+  #
+  # Return a string with the name of the best attribute to classify the examples.
 most.common.value <- function(examples, target) {
   
   value <- NULL
@@ -149,22 +147,22 @@ most.common.value <- function(examples, target) {
 }
 
 # Get the decision tree from a set of examples.
-#
-# The parameters of this function are:
-#
-# 	"examples" are the set of examples
-#
-# 	"target" is the attribute whose value is to be predicted by the tree
-#
-# 	"attributes" is a vector of other attributes that may be tested by the
-# 	learned decision tree.
-#
-#   "labels" is a vector with the labels to classify the "examples"
-#
-#   "tree" is data structure to save the decision tree
-#
-# Esta función regresa una lista con dos componentes: 'root', que es la variable nodo
-# obtenido de la iteración con id3, y 'tree' que es el árbol construido.
+  #
+  # The parameters of this function are:
+  #
+  # 	"examples" are the set of examples
+  #
+  # 	"target" is the attribute whose value is to be predicted by the tree
+  #
+  # 	"attributes" is a vector of other attributes that may be tested by the
+  # 	learned decision tree.
+  #
+  #   "labels" is a vector with the labels to classify the "examples"
+  #
+  #   "tree" is data structure to save the decision tree
+  #
+  # Esta función regresa una lista con dos componentes: 'root', que es la variable nodo
+  # obtenido de la iteración con id3, y 'tree' que es el árbol construido.
 
 id3 <- function(examples, target, attributes, labels, tree) {
   
@@ -266,15 +264,14 @@ id3 <- function(examples, target, attributes, labels, tree) {
 }
 
 # Classify an example from the tree model
-#
-# The parameters are
-#
-#	"tree" the tree model obtained with learn.tree()
-#	"example" one example to be classify
-#
-# Return the label for "example"
-classify.example <- function(tree=NULL, example=NULL) 
-{
+  #
+  # The parameters are
+  #
+  #	"tree" the tree model obtained with learn.tree()
+  #	"example" one example to be classify
+  #
+  # Return the label for "example"
+classify.example <- function(tree=NULL, example=NULL) {
   label <- NULL
   
   #######
@@ -340,20 +337,19 @@ classify.example <- function(tree=NULL, example=NULL)
 }
 
 # Realice todo el pre-procesamiento necesario de los datos en esta función.
-# En la función se encuentra el pre-procesamiento del dataset PlayTennis para que 
-# se obtengan estructuras necesarias para trabajar con ID3.
-# Modifique esta función para poder manipular distintos tipos de dataset 
-# (spam, restaurant,tennis)
-# De esta manera se le facilitará la carga de datos
-#
-# REGRESA: 
-# target.attribute: la etiqueta del atributo objetivo target 
-# labels: los valores posibles de clasificación
-# examples: matriz conjunto de ejemplos que serán utilizados para clasificar el árbol
-# attributes: vector listado de nombres de atributos
+  # En la función se encuentra el pre-procesamiento del dataset PlayTennis para que 
+  # se obtengan estructuras necesarias para trabajar con ID3.
+  # Modifique esta función para poder manipular distintos tipos de dataset 
+  # (spam, restaurant,tennis)
+  # De esta manera se le facilitará la carga de datos
+  #
+  # REGRESA: 
+  # target.attribute: la etiqueta del atributo objetivo target 
+  # labels: los valores posibles de clasificación
+  # examples: matriz conjunto de ejemplos que serán utilizados para clasificar el árbol
+  # attributes: vector listado de nombres de atributos
 
-load.data <- function(path.data="../data/",name="tennis.csv")
-{
+load.data <- function(path.data="../data/",name="tennis.csv"){
   #variables que debe completar, luego de cargar cada dataset
   target <- NULL
   labels <- NULL 
@@ -404,8 +400,7 @@ load.data <- function(path.data="../data/",name="tennis.csv")
   return (list(target.attribute=target, labels = etiquetas, examples=examples,attributes=attributes))
 }
 
-run.tree.experiment <- function(name)
-{
+run.tree.experiment <- function(name){
   
   # 1- CARGA DE DATOS
   # path.data : donde se encuentra el directorio data de este laboratorio 1
