@@ -77,7 +77,7 @@ naiveBayesModel <- function(examples,
     model[["apriori"]][1,class] <- sum(examples[,target.attribute]==class)/nrow(examples) 
     #guarda para acada uno la probabilidad global (del si o del no)
   }
-  View(examples)
+  # View(examples)
   
   # Calculo probabilidades condicionales para cada atributo
   for (att in attributes){
@@ -92,7 +92,7 @@ naiveBayesModel <- function(examples,
         #######
         ind.value <- which(examples[,att]==value)
         cant.value <- length(ind.value)
-        f_cond <- sum(examples[which(examples[,att]==value),target.attribute]==class)/cant.value 
+        f_cond <- sum(examples[which(examples[,att]==value),target.attribute]==class) 
         print(f_cond)
         ########
         
@@ -112,9 +112,15 @@ naiveBayesModel <- function(examples,
     for(class in labels){
       
       #######
-      #
-      # ADD YOUR CODE HERE
-      #
+      prob.cond <- 0
+      # print("ACA")
+      total.class <- sum(model[[att]][class,])
+      # print(total.class)
+      for(value in colnames(model[[att]])){
+        model[[att]][class,value] <- (model[[att]][class,value]/total.class)
+        # print(paste("normalizado",att,model[[att]][class,value]))
+      }
+      
       ########
     }
   }
@@ -249,7 +255,7 @@ run.nb.experiment <- function(path)
 			      labels = dataset$labels,
             laplace=1)
   
-  print(nb.model$apriori)
+  print(nb.model)
   
   # 3- CLASIFICAR un nuevo ejemplo
   # Complete el argumento example con el nuevo ejemplo a clasificar (e.g: my_example <- c("Overcast","Cold","Normal","Weak"))
