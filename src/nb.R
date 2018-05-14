@@ -84,7 +84,7 @@ naiveBayesModel <- function(examples,
     # <--- por cada atributo
     for (class in labels){ # <--- por cada etiqueta de clasificación
       for(value in colnames(model[[att]])){ # <--- por cada valor que puede tomar ese atributo
-        print(paste("COLNAMES",value,"class",class))
+        # print(paste("COLNAMES",value,"class",class))
         f_cond <- 0
         
         # Para cada clase, realizar un recuento de los valores de atributos que toma cada ejemplo.
@@ -93,7 +93,7 @@ naiveBayesModel <- function(examples,
         ind.value <- which(examples[,att]==value)
         cant.value <- length(ind.value)
         f_cond <- sum(examples[which(examples[,att]==value),target.attribute]==class) 
-        print(f_cond)
+        # print(f_cond)
         ########
         
         # Aplicar la Corrección de Laplace, para que los valores "cero" no den problemas.
@@ -160,11 +160,12 @@ classify.example <- function(model, test_set) {
   # Si no tienen nombre
   if(is.null(colnames(test_set))) colnames(test_set) <- names(model)[-1]
   
-  result <- matrix(0,nrow=filas,ncol=3,dimnames=list(NULL,c(classes,"class")))  
+  result <- matrix(0,nrow=filas,ncol=(length(classes)+1),dimnames=list(NULL,c(classes,"class")))  
     
   for(class in classes){
     for(i in 1:filas){      
       for(p_cond in names(model)){
+        # print(paste("NAMES",names(model)))
         if (p_cond == "apriori"){
           result[i,class] <- model[[p_cond]][1,class]
         }else{
@@ -178,9 +179,20 @@ classify.example <- function(model, test_set) {
   # 2) Calcular el ArgMax y guardarlo en result[i,"class"]
   
   #######
-  #
-  # ADD YOUR CODE HERE
-  #
+  #normalizacion de nuevo
+  for( i in 1:nrow(result)){
+    total.fila <- 0
+    for(j in 1:(ncol(result)-1)){
+      total.fila <- as.numeric(result[i,j]) + total.fila
+    }
+    # print(dimnames(total.fila))
+    # print(total.fila)
+    # print(result[i,])
+    result[i,] <- result[i,]/total.fila
+    result[i,ncol(result)] <- which(result[i,]==max(result[i,]))
+    # print(colnames(result)[which(result[i,]==max(result[i,]))])
+    # print(colnames(result)[1])
+  }
   ########
   
   return(result)
