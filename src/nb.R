@@ -153,12 +153,12 @@ classify.example <- function(model, test_set) {
     filas <- nrow(test_set)
   }
   
-  classes <- colnames(model[["apriori"]])
+  classes <- colnames(model[["apriori"]]) #nombres de las clases
   
   # Si no tienen nombre
   if(is.null(colnames(test_set))) colnames(test_set) <- names(model)[-1]
   
-  result <- matrix(0,nrow=filas,ncol=3,dimnames=list(NULL,c(classes,"class")))  
+  result <- matrix(0,nrow=filas,ncol=length(classes)+1,dimnames=list(NULL,c(classes,"class")))  
     
   for(class in classes){
     for(i in 1:filas){      
@@ -176,9 +176,22 @@ classify.example <- function(model, test_set) {
   # 2) Calcular el ArgMax y guardarlo en result[i,"class"]
   
   #######
-  #
-  # ADD YOUR CODE HERE
-  #
+  #Normalizar
+  for(i in 1:nrow(result)){
+    total.sumfila <- 0
+    for(j in 1:(ncol(result)-1)){
+      total.sumfila <- total.sumfila + as.numeric(result[i,j])
+    }
+    # print(total.sumfila)
+    result[i,] <- result[i,]/total.sumfila
+    
+    print(colnames(result)[which(result[i,]==max(result[i,]))])
+    result[i,ncol(result)] <- which(result[i,]==max(result[i,]))
+  }
+  
+  #Elegir máximo
+  
+  
   ########
   
   return(result)
