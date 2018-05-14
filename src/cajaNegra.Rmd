@@ -75,13 +75,16 @@ spam <- length(which(m.train$matrix$category=="SPAM"))
 nospam <- length(which(m.train$matrix$category=="NO-SPAM"))
 
 
-spam<-(spam/nrow(m.train$matrix))*100
-nospam <- (nospam/nrow(m.train$matrix))*100
+distspam<-(spam/nrow(m.train$matrix))*100
+distnospam <- (nospam/nrow(m.train$matrix))*100
+distribucion = c(distspam, distnospam)
+categorias <- c("spam", "no-spam")
+distdata = data.frame(distribucion, categorias)
 
-ggplot(data= c(spam, nospam), aes(x= c("spam", "no-spam"), y= c(spam, nospam) ,fill="red")) + 
-  geom_bar(stat="identity")  +
-  ggtitle("Distribuci?n de clases") +
-  labs(x="Categorias", y ="Distribuci?n(%)") 
+library(ggplot2)
+ggplot(data= distdata, aes(x=distdata$categorias, y=distdata$distribucion, fill="red")) + geom_bar(stat="identity")+
+  ggtitle("Distribución de clases") + 
+  labs(x="Categorias", y ="Distribución(%)") 
 
 
 
@@ -118,7 +121,7 @@ ggplot(data= graphSet) +
   geom_bar(aes(x = names, y= graphSet$noSpam), stat="identity", fill="#00AA33")+
   geom_bar(aes(x = names, y= -(graphSet$spam)), stat="identity", fill="#AA0033")+
   ggtitle('Mails')+
-  labs(x="Frases", y = "Cantidad")
+  labs(x="Palabras", y = "Cantidad")
 
 ```
 
