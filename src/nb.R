@@ -33,6 +33,7 @@ naiveBayesModel <- function(examples,
                             labels,
                             laplace=1) {
   
+  #Verifica que todos los valores esten completados
   if(is.null(examples)) stop("examples no puede ser nulo")
   if(is.null(attributes)) stop("attributes no puede ser nulo")
   if(is.null(target.attribute)) stop("target.attribute no puede ser nulo")
@@ -46,7 +47,7 @@ naiveBayesModel <- function(examples,
   #para el dataset de tennis, probabilidad de YES y de NO dado el dataset de entrenamiento.
     
   col_names <- labels
-  row_names <- target.attribute  
+  row_names <- target.attribute  #class
   model[["apriori"]] <- matrix(NA,
                                nrow=length(row_names),
                                ncol=length(col_names),
@@ -70,6 +71,7 @@ naiveBayesModel <- function(examples,
   # puede que éste nos proporciones dichas probabilidades.
   # Nosotros utilizaremos la probabilidad del conjunto de entrenamiento.
   for (class in labels){
+    #guarda en la matriz apriori la probabilidad de que el resultado sea un "si" o un "no" / "spam" o "No-spam"
     model[["apriori"]][1,class] <- sum(examples[,target.attribute]==class)/nrow(examples) 
   }
   
@@ -77,15 +79,21 @@ naiveBayesModel <- function(examples,
   for (att in attributes){ # <--- por cada atributo
     for (class in labels){ # <--- por cada etiqueta de clasificación
       for(value in colnames(model[[att]])){ # <--- por cada valor que puede tomar ese atributo
+        print(att)
+        print(class)
+        print(value)
+        
         
         f_cond <- 0
         
         # Para cada clase, realizar un recuento de los valores de atributos que toma cada ejemplo.
         # setee el valor en la variable f_cond  
         #######
-        #
-        # ADD YOUR CODE HERE
-        #
+        
+        cant.value <- length(which(examples[,att]==value))
+        f_cond<- sum(examples[which(examples[,att]==value),target.attribute]==class)/cant.value
+        print(f_cond)
+        
         ########
         
         # Aplicar la Corrección de Laplace, para que los valores "cero" no den problemas.
@@ -187,12 +195,31 @@ classify.example <- function(model, test_set) {
 
 load.data <- function(path='../data/tennis.csv')
 {
-  examples <- read.csv(path,header=TRUE, stringsAsFactors=FALSE)
-  examples <- as.matrix(examples)  
-  attributes <- as.vector(dimnames(examples)[[2]])
-  attributes <- attributes[-(ncol(examples))]
-  etiquetas <- unique(examples[,ncol(examples)])
-  target <- (colnames(examples))[length(colnames(examples))]
+  if(endsWith(path,"csv")){
+    examples <- read.csv(path,header=TRUE, stringsAsFactors=FALSE)
+    examples <- as.matrix(examples)  
+    attributes <- as.vector(dimnames(examples)[[2]])
+    attributes <- attributes[-(ncol(examples))]
+    etiquetas <- unique(examples[,ncol(examples)])
+    target <- (colnames(examples))[length(colnames(examples))]
+  }else{
+    source("read-matrix.R") 
+    m.train <- read_matrix(filename="../data/MATRIX.TRAIN.50",ocurrence=FALSE,sparse=FALSE)
+    # View(m.train)
+    examples <- as.matrix(m.train$matrix)
+    for(j in 1:(ncol(examples)-1)){
+      dimnames(examples)[[2]][j] <- m.train$tokens[j]
+    }
+    # View(examples)
+    attributes <- as.vector(dimnames(examples)[[2]])
+    attributes <- attributes[-ncol(examples)]
+    # View(attributes)
+    etiquetas <- unique(examples[,ncol(examples)])
+    target <- (colnames(examples))[length(colnames(examples))]
+    # for(i in 1:length(attributes))
+    #   VALUES[[attributes[i]]] <<- unique(examples[,attributes[i]])
+  }
+
   
   return (list(target.attribute=target,
 		        labels = etiquetas,
@@ -203,15 +230,17 @@ load.data <- function(path='../data/tennis.csv')
 
 
 
-run.nb.experiment <- function()
+run.nb.experiment <- function(name)
 {
   
   # 1- CARGA DE DATOS
   # pasar el argumento path='' con el path del dataset que desee cargar
-  dataset <- load.data() 
+  path.data <- paste("../data/",name,sep="")
+  # print(path.data)
+  dataset <- load.data(path.data) 
   
   ##Para ver los elementos de dataset, descomente las siguientes líneas antes de ejecutar
-  # print(daraset$examples)
+  # print(dataset$examples)
   # print(dataset$target)
   # print(dataset$labels)
   # print(dataset$attributes)
@@ -223,7 +252,7 @@ run.nb.experiment <- function()
 			      labels = dataset$labels,
             laplace=1)
   
-  print(nb.model)
+  print(nb.model$apriori)
   
   # 3- CLASIFICAR un nuevo ejemplo
   # Complete el argumento example con el nuevo ejemplo a clasificar (e.g: my_example <- c("Overcast","Cold","Normal","Weak"))
