@@ -13,8 +13,6 @@ VALUES <- list() # variable de acceso global
 entropia <- function(values){
   
   ent <- 0
-  
-  #######
   total <- sum(values)
   
   for(i in 1:length(values)) {
@@ -24,9 +22,6 @@ entropia <- function(values){
   }
     
     return(ent)
-  
-  
-  ########
   
   #descomente si desea que el valor sea mostrado en pantalla
   #print(c("calculo entropia",ent))
@@ -46,9 +41,7 @@ entropia <- function(values){
 best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE) {
   
   best.att <- "" #guardará nombre del mejor atributo
-  
-  #######
-  
+
   dataTarget <- examples[,target]
   labelsTarget <- unique(examples[,target])
   canTotal <- length(dataTarget)
@@ -58,13 +51,13 @@ best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE)
     cants[i,1] <- labelsTarget[i]
     cants[i,2] <- length(which(examples[,target] == labelsTarget[i]))
   }
+
   entropia.target <- entropia(as.numeric(cants[,2]))
-  print(entropia.target)
+  # print(entropia.target)
   
   gain.matrix <- matrix(data=0, nrow=length(attributes),ncol =2)
   
   #atributos
-  
   for(i in 1:length(attributes)){
    
     data <- matrix(data=0,nrow = length(dataTarget), ncol= 2)
@@ -179,8 +172,7 @@ id3 <- function(examples, target, attributes, labels, tree) {
       class <- labels[i]
       root <- new.leaf(class)
 
-      print(paste("leaf ", labels[i]))
-      
+      #print(paste("leaf ", labels[i]))
 
       return(new.tree(root))
     }
@@ -190,7 +182,7 @@ id3 <- function(examples, target, attributes, labels, tree) {
     class <- most.common.value(examples, target)
     root <- new.leaf(class)
 
-    print(paste("leaf ", root$label))
+    #print(paste("leaf ", root$label))
 
     return(new.tree(root))
   }
@@ -273,19 +265,13 @@ id3 <- function(examples, target, attributes, labels, tree) {
   # Return the label for "example"
 classify.example <- function(tree=NULL, example=NULL) {
   label <- NULL
-  
-  #######
   parent <- NULL
   
-  if(is.null(parent)){ #Es la ra?z?
-    
+  if(is.null(parent)){    
     varExam <- NULL
     
     # Itero en example hasta que coincida con la raiz
     for(i in 1:length(example)){
-      #print(names(tree$nodes[[1]]$branches))
-      
-      #any -> verifica si en un arreglo al menos alguno de los valores es verdadero. 
       
       #Si alguno de los valores del ejemplo est? presente en alguna de las ramas del arbol
       if(any(example[i] == names(tree$nodes[[1]]$branches))){
@@ -356,8 +342,7 @@ load.data <- function(path.data="../data/",name="tennis.csv"){
   examples<- NULL
   attributes <- NULL 
   
-  if(startsWith(name,"tennis"))
-  {
+  if(startsWith(name,"tennis")){
     path <- paste(path.data,name,sep="")
     examples <- read.csv(path,header=TRUE, stringsAsFactors=FALSE)
     examples <- as.matrix(examples)
@@ -409,12 +394,13 @@ run.tree.experiment <- function(name){
   dataset <- load.data(path.data="../data/",name) 
   ## Para ver los elementos de dataset, 
   ## descomente las siguientes l??neas antes de ejecutar
-  print("target: ")
+  print("---target:---------------------------------------------------------------")
   print(dataset$target.attribute)
-  print("labels: ")
+  print("---labels:---------------------------------------------------------------")
   print(dataset$labels)
-  print("attributes: ")
+  print("---attributes:-----------------------------------------------------------")
   print(dataset$attributes)
+  print("-------------------------------------------------------------------------")
   
   # 2- CONSTRUCCIÓN DEL ÁRBOL USANDO ID3
   result <- id3(dataset$examples,dataset$target.attribute,dataset$attributes,dataset$labels,NULL)
@@ -428,10 +414,6 @@ run.tree.experiment <- function(name){
   # El ejemplo dependerá del dataset con el que esté trabajando
   # Muestre en consola el ejemplo a clasificar y el resultado.
   
-  # example <- c("Rain","Mild","Normal","Strong")
-  # example <- c("Rain","Mild","High","Strong")
-  # example <- c("Sunny","Mild","Normal","Strong")
-  # example <- c("Sunny","Mild","High","Strong")
   example <- c("Overcast","Mild","Normal","Strong")
   
   classify.example(tree=result, example=example) 

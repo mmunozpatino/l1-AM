@@ -78,7 +78,7 @@ nospam <- length(which(m.train$matrix$category=="NO-SPAM"))
 spam<-(spam/nrow(m.train$matrix))*100
 nospam <- (nospam/nrow(m.train$matrix))*100
 
-ggplot(data= distdata, aes(x= c("spam", "no-spam"), y= c(spam, nospam) ,fill="red")) + 
+ggplot(data= c(spam, nospam), aes(x= c("spam", "no-spam"), y= c(spam, nospam) ,fill="red")) + 
   geom_bar(stat="identity")  +
   ggtitle("Distribuci?n de clases") +
   labs(x="Categorias", y ="Distribuci?n(%)") 
@@ -150,7 +150,7 @@ print(result)
 ### Punto (B) 
 Dado los resultados obtenidos en (A) y indique como calcularía la performance del clasificador.
 
-
+Teniendo en cuenta el teorema de bayes, podriamos calcular la performance del clasificador como
 
 
 
