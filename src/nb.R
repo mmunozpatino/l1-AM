@@ -187,12 +187,30 @@ classify.example <- function(model, test_set) {
 
 load.data <- function(path='../data/tennis.csv')
 {
-  examples <- read.csv(path,header=TRUE, stringsAsFactors=FALSE)
-  examples <- as.matrix(examples)  
-  attributes <- as.vector(dimnames(examples)[[2]])
-  attributes <- attributes[-(ncol(examples))]
-  etiquetas <- unique(examples[,ncol(examples)])
-  target <- (colnames(examples))[length(colnames(examples))]
+  if(endsWith(path,"csv")){
+    examples <- read.csv(path,header=TRUE, stringsAsFactors=FALSE)
+    examples <- as.matrix(examples) 
+    # print(paste("examples",examples))
+    attributes <- as.vector(dimnames(examples)[[2]])
+    attributes <- attributes[-(ncol(examples))]
+    etiquetas <- unique(examples[,ncol(examples)])
+    target <- (colnames(examples))[length(colnames(examples))]
+  }else{
+    source("read-matrix.R") 
+    m.train <- read_matrix(filename="../data/MATRIX.TRAIN.50",ocurrence=FALSE,sparse=FALSE)
+    examples <- as.matrix(m.train$matrix)
+    for(j in 1:(ncol(examples)-1)){
+      dimnames(examples)[[2]][j] <- m.train$tokens[j]
+    }
+    attributes <- as.vector(dimnames(examples)[[2]])
+    attributes <- attributes[-ncol(examples)]
+    etiquetas <- unique(examples[,ncol(examples)])
+    target <- (colnames(examples))[length(colnames(examples))]
+    # for(i in 1:length(attributes))
+    #   VALUES[[attributes[i]]] <<- unique(examples[,attributes[i]])
+  }
+    
+  
   
   return (list(target.attribute=target,
 		        labels = etiquetas,
@@ -203,15 +221,15 @@ load.data <- function(path='../data/tennis.csv')
 
 
 
-run.nb.experiment <- function()
+run.nb.experiment <- function(path)
 {
   
   # 1- CARGA DE DATOS
   # pasar el argumento path='' con el path del dataset que desee cargar
-  dataset <- load.data() 
+  dataset <- load.data(path) 
   
   ##Para ver los elementos de dataset, descomente las siguientes líneas antes de ejecutar
-  # print(daraset$examples)
+  # print(dataset$examples)
   # print(dataset$target)
   # print(dataset$labels)
   # print(dataset$attributes)
