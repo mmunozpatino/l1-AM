@@ -46,7 +46,8 @@ naiveBayesModel <- function(examples,
   #para el dataset de tennis, probabilidad de YES y de NO dado el dataset de entrenamiento.
     
   col_names <- labels
-  row_names <- target.attribute  
+  row_names <- target.attribute  # class (nombre del objetivo)
+  # print(paste("target.attribute: ",target.attribute))
   model[["apriori"]] <- matrix(NA,
                                nrow=length(row_names),
                                ncol=length(col_names),
@@ -56,11 +57,13 @@ naiveBayesModel <- function(examples,
   #de cada atributo se guardará su tabla con probabilidades condicionales
   for (att in attributes){
     col_names <- sort(unique(examples[,att]))
+    # print(paste("COL_NAMES",col_names))
     row_names <- labels
     model[[att]] <- matrix(NA,
                           nrow=length(row_names),
                           ncol=length(col_names),
                           dimnames=list(row_names,col_names))
+    #genera una matriz para cada atributo
   }
   
   # Calcular las probabilidades a priori de cada clase.
@@ -69,23 +72,28 @@ naiveBayesModel <- function(examples,
   # es decir, 1 divido entre el número de clases. Si contamos con la opinión de un experto,
   # puede que éste nos proporciones dichas probabilidades.
   # Nosotros utilizaremos la probabilidad del conjunto de entrenamiento.
+  # print(paste("LABELS",labels))
   for (class in labels){
     model[["apriori"]][1,class] <- sum(examples[,target.attribute]==class)/nrow(examples) 
+    #guarda para acada uno la probabilidad global (del si o del no)
   }
+  View(examples)
   
   # Calculo probabilidades condicionales para cada atributo
-  for (att in attributes){ # <--- por cada atributo
+  for (att in attributes){
+    # <--- por cada atributo
     for (class in labels){ # <--- por cada etiqueta de clasificación
       for(value in colnames(model[[att]])){ # <--- por cada valor que puede tomar ese atributo
-        
+        print(paste("COLNAMES",value,"class",class))
         f_cond <- 0
         
         # Para cada clase, realizar un recuento de los valores de atributos que toma cada ejemplo.
         # setee el valor en la variable f_cond  
         #######
-        #
-        # ADD YOUR CODE HERE
-        #
+        ind.value <- which(examples[,att]==value)
+        cant.value <- length(ind.value)
+        f_cond <- sum(examples[which(examples[,att]==value),target.attribute]==class)/cant.value 
+        print(f_cond)
         ########
         
         # Aplicar la Corrección de Laplace, para que los valores "cero" no den problemas.
@@ -241,7 +249,7 @@ run.nb.experiment <- function(path)
 			      labels = dataset$labels,
             laplace=1)
   
-  print(nb.model)
+  print(nb.model$apriori)
   
   # 3- CLASIFICAR un nuevo ejemplo
   # Complete el argumento example con el nuevo ejemplo a clasificar (e.g: my_example <- c("Overcast","Cold","Normal","Weak"))
