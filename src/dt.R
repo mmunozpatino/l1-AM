@@ -44,7 +44,7 @@ entropia <- function(values){
 # Return a string with the name of the best attribute to classify the examples.
 # Use la funcion "entropia" para el cálculo de la misma
 
-best.attribute <- function(examples, attributes, target, labels, splitInf=TRUE) {
+best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE) {
   
   best.att <- "" #guardará nombre del mejor atributo
   
