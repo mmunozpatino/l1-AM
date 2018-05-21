@@ -116,17 +116,17 @@ naiveBayesModel <- function(examples,
 }
 
 #########################################################-----------------##################
-# Esta función debe regresar por cada ejemplo recibido la etiqueta correspondiente de clasificación
-#
-# Los parámetros son:
+  # Esta función debe regresar por cada ejemplo recibido la etiqueta correspondiente de clasificación
+  #
+  # Los parámetros son:
 
-#    model: es una lista con los parámetros del modelo Naive Bayes
-#
-#    test_set: una matriz con ejemplos a clasificar
-#
-# Debe regresar una matrix con la probabilidad condicional posterior de cada clase,
-# y la clase (elemento "class" ) cuyo valor de probabilidad resultó máximo
-#
+  #    model: es una lista con los parámetros del modelo Naive Bayes
+  #
+  #    test_set: una matriz con ejemplos a clasificar
+  #
+  # Debe regresar una matrix con la probabilidad condicional posterior de cada clase,
+  # y la clase (elemento "class" ) cuyo valor de probabilidad resultó máximo
+  #
 classify.example <- function(model, test_set) {
  
   # Si no hay test_set paro
@@ -173,22 +173,23 @@ classify.example <- function(model, test_set) {
 }
 
 ##################-----------------##################
-# Realice todo el pre-procesamiento necesario de los datos en esta función
-# En la función se encuentra el pre-procesamiento del dataset PlayTennis para que 
-# se obtengan estructuras necesarias para trabajar con Naïve Bayes.
-# Modifique esta función para poder manipular distintos tipos de dataset (spam, restaurant,tennis)
-# De esta manera se le facilitará la carga de datos
-#
-# REGRESA: 
-# target.attribute: la etiqueta del atributo objetivo target 
-# labels: los valores posibles de clasificación
-# examples: matriz conjunto de ejemplos que serán utilizados para clasificar el árbol
-# attributes: vector listado de nombres de atributos
+  # Realice todo el pre-procesamiento necesario de los datos en esta función
+  # En la función se encuentra el pre-procesamiento del dataset PlayTennis para que 
+  # se obtengan estructuras necesarias para trabajar con Naïve Bayes.
+  # Modifique esta función para poder manipular distintos tipos de dataset (spam, restaurant,tennis)
+  # De esta manera se le facilitará la carga de datos
+  #
+  # REGRESA: 
+  # target.attribute: la etiqueta del atributo objetivo target 
+  # labels: los valores posibles de clasificación
+  # examples: matriz conjunto de ejemplos que serán utilizados para clasificar el árbol
+  # attributes: vector listado de nombres de atributos
 
 load.data <- function(path='../data/tennis.csv')
 {
+  path <- '../data/MATRIX'
   examples <- read.csv(path,header=TRUE, stringsAsFactors=FALSE)
-  examples <- as.matrix(examples)  
+  examples <- as.data.frame(examples)  
   attributes <- as.vector(dimnames(examples)[[2]])
   attributes <- attributes[-(ncol(examples))]
   etiquetas <- unique(examples[,ncol(examples)])

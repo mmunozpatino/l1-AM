@@ -57,8 +57,10 @@ best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE)
   
   gain.matrix <- matrix(data=0, nrow=length(attributes),ncol =2)
   
+  splitvalue <- c()
   #atributos
   for(i in 1:length(attributes)){
+
    
     data <- matrix(data=0,nrow = length(dataTarget), ncol= 2)
     data[,1] <- examples[,attributes[i]]
@@ -67,7 +69,10 @@ best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE)
     etiqueta <- unique(data[,1])
     entropias.vector <- c()
     
+    splitvalue <- 0
+
     for(j in 1:length(etiqueta)){
+
       dataEtiqueta <- matrix(data=0, nrow= length(data[which(data[,1] == etiqueta[j])]), ncol=2)
       dataEtiqueta[,1] <- data[which(data[,1] == etiqueta[j]),1]
       dataEtiqueta[,2] <- data[which(data[,1] == etiqueta[j]),2] #cortamos la tabla por etiqueta. Por ej: Sunny
@@ -75,10 +80,10 @@ best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE)
       # print(dataEtiqueta)
       cantDataEtiqueta <- nrow(dataEtiqueta) # cantidad de valores con la etiqueta 
       p <- c()
-      
+
       for(k in 1:length(labelsTarget)){
         if(nrow(dataEtiqueta)>1){
-          pm <- length(dataEtiqueta[which(dataEtiqueta[,2] == labelsTarget[k])]) #cuenta cuantos si/no hay
+          pm <- length(dataEtiqueta[which(dataEtiqueta[,2] == labelsTarget[k])])
         }else{
           pm <- 1
         }
@@ -87,27 +92,38 @@ best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE)
         #print(paste("P",p))
       }
       
-      entropia.attribute <- entropia(p)
-      entropias.vector <- c(entropias.vector,(cantDataEtiqueta/canTotal) * entropia.attribute)
-      
+      splitvalue <- splitvalue - (cantDataEtiqueta / canTotal)* log2(cantDataEtiqueta / canTotal)
+
+      # print("--------splitvalue:--------------------")
+      # print(paste(etiqueta[j], j))
+      # print(splitvalue)
+   
       #print(dataEtiqueta[j,1])
       #print(entropia.attribute)
       #print(entropias.vector)
     }
-    
     gain.matrix[i,1] <- attributes[i]
-    gain.matrix[i,2] <- entropia.target - sum(entropias.vector)
+    
+    if(splitInf){
+      gain.matrix[i,2] <- (entropia.target - sum(entropias.vector))/splitvalue
+    }else{
+      gain.matrix[i,2] <- entropia.target - sum(entropias.vector)
+    }
     
   }
 
-    #print(gain.matrix)
-    best.att <- gain.matrix[order(gain.matrix[,2],decreasing = TRUE)[1],1]
-    gan <- gain.matrix[order(gain.matrix[,2], decreasing = TRUE)[1],2]
+  # print(gain.matrix)
+  # print("------------------------------------------")
+  best.att <- gain.matrix[order(gain.matrix[,2],decreasing = TRUE)[1],1]
+  gan <- gain.matrix[order(gain.matrix[,2], decreasing = TRUE)[1],2]
     
     
   ########
   # Mostrar nombre del mejor atributo best.att y su valor de ganancia (gan)
+  
+  print("------------------------------------------")  
   print(c('mejor attributo:',best.att,gan))
+  print("------------------------------------------")
   
   return(best.att)
 }
@@ -193,7 +209,7 @@ id3 <- function(examples, target, attributes, labels, tree) {
    root <- new.node(attribute, VALUES[[attribute]])
    
    if (is.null(tree)) tree <- new.tree(root) #Si el arbol esta vacio agrego la raiz
-   cat("attribute selected: ", attribute, "\n")
+  #  cat("attribute selected: ", attribute, "\n")
   #print(root)
    
   #Va a recorrer cada valor de cada atributo -> por ejemplo para Outlook "Sunny", Overcast y Rain
@@ -204,7 +220,7 @@ id3 <- function(examples, target, attributes, labels, tree) {
      
       #Selecciona el primer valor que puede tomar la variable
      value <- as.character(VALUES[[attribute]][i])
-     print(paste("root is ", root$name, "value selected: ",value))
+    #  print(paste("root is ", root$name, "value selected: ",value))
     
      
      #Subset of examples that have value vi for A
