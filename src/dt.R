@@ -44,7 +44,7 @@ entropia <- function(values){
 # Return a string with the name of the best attribute to classify the examples.
 # Use la funcion "entropia" para el cálculo de la misma
 
-best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE) {
+best.attribute <- function(examples, attributes, target, labels, splitInf=TRUE) {
   
   best.att <- "" #guardará nombre del mejor atributo
   
@@ -64,6 +64,7 @@ best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE)
   
   gain.matrix <- matrix(data=0, nrow=length(attributes),ncol =2)
   
+  splitvalue <- c()
   #atributos
   
   for(i in 1:length(attributes)){
@@ -74,6 +75,7 @@ best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE)
     
     etiqueta <- unique(data[,1])
     entropias.vector <- c()
+    splitvalue <- 0
     
     for(j in 1:length(etiqueta)){
       dataEtiqueta <- matrix(data=0, nrow= length(data[which(data[,1] == etiqueta[j])]), ncol=2)
@@ -95,6 +97,8 @@ best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE)
         #print(paste("P",p))
       }
       
+      splitvalue <- splitvalue - (cantDataEtiqueta / canTotal)* log2(cantDataEtiqueta / canTotal)
+      
       entropia.attribute <- entropia(p)
       entropias.vector <- c(entropias.vector,(cantDataEtiqueta/canTotal) * entropia.attribute)
       
@@ -104,7 +108,13 @@ best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE)
     }
     
     gain.matrix[i,1] <- attributes[i]
-    gain.matrix[i,2] <- entropia.target - sum(entropias.vector)
+    
+    if(splitInf){
+      gain.matrix[i,2] <- (entropia.target - sum(entropias.vector))/splitvalue
+    }else{
+      gain.matrix[i,2] <- entropia.target - sum(entropias.vector)
+    }
+    
     
   }
 

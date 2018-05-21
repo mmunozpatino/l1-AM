@@ -185,12 +185,10 @@ classify.example <- function(model, test_set) {
     # print(total.sumfila)
     result[i,] <- result[i,]/total.sumfila
     
-    print(colnames(result)[which(result[i,]==max(result[i,]))])
+    #Elegir máximo
+    # print(colnames(result)[which(result[i,]==max(result[i,]))])
     result[i,ncol(result)] <- which(result[i,]==max(result[i,]))
   }
-  
-  #Elegir máximo
-  
   
   ########
   
