@@ -47,7 +47,8 @@ naiveBayesModel <- function(examples,
   #para el dataset de tennis, probabilidad de YES y de NO dado el dataset de entrenamiento.
     
   col_names <- labels
-  row_names <- target.attribute  #class
+  row_names <- target.attribute  # class (nombre del objetivo)
+  # print(paste("target.attribute: ",target.attribute))
   model[["apriori"]] <- matrix(NA,
                                nrow=length(row_names),
                                ncol=length(col_names),
@@ -57,11 +58,13 @@ naiveBayesModel <- function(examples,
   #de cada atributo se guardará su tabla con probabilidades condicionales
   for (att in attributes){
     col_names <- sort(unique(examples[,att]))
+    # print(paste("COL_NAMES",col_names))
     row_names <- labels
     model[[att]] <- matrix(NA,
                           nrow=length(row_names),
                           ncol=length(col_names),
                           dimnames=list(row_names,col_names))
+    #genera una matriz para cada atributo
   }
   
   # Calcular las probabilidades a priori de cada clase.
@@ -70,25 +73,30 @@ naiveBayesModel <- function(examples,
   # es decir, 1 divido entre el número de clases. Si contamos con la opinión de un experto,
   # puede que éste nos proporciones dichas probabilidades.
   # Nosotros utilizaremos la probabilidad del conjunto de entrenamiento.
+  # print(paste("LABELS",labels))
   for (class in labels){
     #guarda en la matriz apriori la probabilidad de que el resultado sea un "si" o un "no" / "spam" o "No-spam"
     model[["apriori"]][1,class] <- sum(examples[,target.attribute]==class)/nrow(examples) 
+    #guarda para acada uno la probabilidad global (del si o del no)
   }
+  # View(examples)
   
   # Calculo probabilidades condicionales para cada atributo
-  for (att in attributes){ # <--- por cada atributo
+  for (att in attributes){
+    # <--- por cada atributo
     for (class in labels){ # <--- por cada etiqueta de clasificación
       for(value in colnames(model[[att]])){ # <--- por cada valor que puede tomar ese atributo
-        # print(att)
-        # print(class)
-        # print(value)
-        
-        
+        # print(paste("COLNAMES",value,"class",class))
         f_cond <- 0
         
         # Para cada clase, realizar un recuento de los valores de atributos que toma cada ejemplo.
         # setee el valor en la variable f_cond  
         #######
+        ind.value <- which(examples[,att]==value)
+        cant.value <- length(ind.value)
+        f_cond <- sum(examples[which(examples[,att]==value),target.attribute]==class) 
+        # print(f_cond)
+        ########
         
         # cant.value <- length(which(examples[,att]==value))
         f_cond<- sum(examples[which(examples[,att]==value),target.attribute]==class)
@@ -112,13 +120,15 @@ naiveBayesModel <- function(examples,
     for(class in labels){
    
       #######
-      total.class <- sum(model[[att]][class,])
+      prob.cond <- 0
       # print("ACA")
+      total.class <- sum(model[[att]][class,])
       # print(total.class)
-      
       for(value in colnames(model[[att]])){
-        model[[att]][class,value] <- model[[att]][class,value]/total.class
+        model[[att]][class,value] <- (model[[att]][class,value]/total.class)
+        # print(paste("normalizado",att,model[[att]][class,value]))
       }
+      
       ########
     }
   }
@@ -158,11 +168,12 @@ classify.example <- function(model, test_set) {
   # Si no tienen nombre
   if(is.null(colnames(test_set))) colnames(test_set) <- names(model)[-1]
   
-  result <- matrix(0,nrow=filas,ncol=length(classes)+1,dimnames=list(NULL,c(classes,"class")))  
+  result <- matrix(0,nrow=filas,ncol=(length(classes)+1),dimnames=list(NULL,c(classes,"class")))  
     
   for(class in classes){
     for(i in 1:filas){      
       for(p_cond in names(model)){
+        # print(paste("NAMES",names(model)))
         if (p_cond == "apriori"){
           result[i,class] <- model[[p_cond]][1,class]
         }else{
@@ -176,22 +187,20 @@ classify.example <- function(model, test_set) {
   # 2) Calcular el ArgMax y guardarlo en result[i,"class"]
   
   #######
-  #Normalizar
-  for(i in 1:nrow(result)){
-    total.sumfila <- 0
+  #normalizacion de nuevo
+  for( i in 1:nrow(result)){
+    total.fila <- 0
     for(j in 1:(ncol(result)-1)){
-      total.sumfila <- total.sumfila + as.numeric(result[i,j])
+      total.fila <- as.numeric(result[i,j]) + total.fila
     }
-    # print(total.sumfila)
-    result[i,] <- result[i,]/total.sumfila
-    
-    print(colnames(result)[which(result[i,]==max(result[i,]))])
+    # print(dimnames(total.fila))
+    # print(total.fila)
+    # print(result[i,])
+    result[i,] <- result[i,]/total.fila
     result[i,ncol(result)] <- which(result[i,]==max(result[i,]))
+    # print(colnames(result)[which(result[i,]==max(result[i,]))])
+    # print(colnames(result)[1])
   }
-  
-  #Elegir m�ximo
-  
-  
   ########
   
   return(result)
@@ -214,7 +223,8 @@ load.data <- function(path='../data/tennis.csv')
 {
   if(endsWith(path,"csv")){
     examples <- read.csv(path,header=TRUE, stringsAsFactors=FALSE)
-    examples <- as.matrix(examples)  
+    examples <- as.matrix(examples) 
+    # print(paste("examples",examples))
     attributes <- as.vector(dimnames(examples)[[2]])
     attributes <- attributes[-(ncol(examples))]
     etiquetas <- unique(examples[,ncol(examples)])
@@ -222,21 +232,19 @@ load.data <- function(path='../data/tennis.csv')
   }else{
     source("read-matrix.R") 
     m.train <- read_matrix(filename="../data/MATRIX.TRAIN.50",ocurrence=FALSE,sparse=FALSE)
-    # View(m.train)
     examples <- as.matrix(m.train$matrix)
     for(j in 1:(ncol(examples)-1)){
       dimnames(examples)[[2]][j] <- m.train$tokens[j]
     }
-    # View(examples)
     attributes <- as.vector(dimnames(examples)[[2]])
     attributes <- attributes[-ncol(examples)]
-    # View(attributes)
     etiquetas <- unique(examples[,ncol(examples)])
     target <- (colnames(examples))[length(colnames(examples))]
     # for(i in 1:length(attributes))
     #   VALUES[[attributes[i]]] <<- unique(examples[,attributes[i]])
   }
-
+    
+  
   
   return (list(target.attribute=target,
 		        labels = etiquetas,
@@ -247,14 +255,12 @@ load.data <- function(path='../data/tennis.csv')
 
 
 
-run.nb.experiment <- function(name)
+run.nb.experiment <- function(path)
 {
   
   # 1- CARGA DE DATOS
   # pasar el argumento path='' con el path del dataset que desee cargar
-  path.data <- paste("../data/",name,sep="")
-  # print(path.data)
-  dataset <- load.data(path.data) 
+  dataset <- load.data(path) 
   
   ##Para ver los elementos de dataset, descomente las siguientes líneas antes de ejecutar
   # print(dataset$examples)

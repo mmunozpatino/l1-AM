@@ -32,6 +32,14 @@ entropia <- function(values){
   #descomente si desea que el valor sea mostrado en pantalla
   #print(c("calculo entropia",ent))
   
+  return(ent)
+  
+  
+  ########
+  
+  #descomente si desea que el valor sea mostrado en pantalla
+  #print(c("calculo entropia",ent))
+  
 }
 
 # Elige el mejor atributo para clasificar los ejemplos en base a 'Information Gain'.
@@ -62,25 +70,24 @@ best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE)
     cants[i,2] <- length(which(examples[,target] == labelsTarget[i]))
   }
   entropia.target <- entropia(as.numeric(cants[,2]))
-  print(entropia.target)
+  # print(entropia.target)
   
   gain.matrix <- matrix(data=0, nrow=length(attributes),ncol =2)
   
   #atributos
+ 
   
   for(i in 1:length(attributes)){
-   
+    
     data <- matrix(data=0,nrow = length(dataTarget), ncol= 2)
     data[,1] <- examples[,attributes[i]]
     data[,2] <- dataTarget
     
     etiqueta <- unique(data[,1])
     entropias.vector <- c()
-    
     splitvalue <- 0
-
+    
     for(j in 1:length(etiqueta)){
-
       dataEtiqueta <- matrix(data=0, nrow= length(data[which(data[,1] == etiqueta[j])]), ncol=2)
       dataEtiqueta[,1] <- data[which(data[,1] == etiqueta[j]),1]
       dataEtiqueta[,2] <- data[which(data[,1] == etiqueta[j]),2] #cortamos la tabla por etiqueta. Por ej: Sunny
@@ -95,34 +102,36 @@ best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE)
         }else{
           pm <- 1
         }
-         
+        
         p <- c(p,pm) #los guarda en un arreglo que es el que va a la entropia
         #print(paste("P",p))
       }
+      splitvalue <- splitvalue - (cantDataEtiqueta / canTotal)* log2(cantDataEtiqueta / canTotal)
       
       entropia.attribute <- entropia(p)
       entropias.vector <- c(entropias.vector,(cantDataEtiqueta/canTotal) * entropia.attribute)
-      splitvalue <- splitvalue - (cantDataEtiqueta / canTotal)* log2(cantDataEtiqueta / canTotal)
+      
       #print(dataEtiqueta[j,1])
       #print(entropia.attribute)
       #print(entropias.vector)
     }
     gain.matrix[i,1] <- attributes[i]
     
+    gain.matrix[i,1] <- attributes[i]
+    gain.matrix[i,2] <- entropia.target - sum(entropias.vector)
+    
     if(splitInf){
       gain.matrix[i,2] <- (entropia.target - sum(entropias.vector))/splitvalue
     }else{
       gain.matrix[i,2] <- entropia.target - sum(entropias.vector)
     }
-    
   }
-
-  # print(gain.matrix)
-  # print("------------------------------------------")
+  
+  #print(gain.matrix)
   best.att <- gain.matrix[order(gain.matrix[,2],decreasing = TRUE)[1],1]
   gan <- gain.matrix[order(gain.matrix[,2], decreasing = TRUE)[1],2]
-    
-    
+  
+  
   ########
   # Mostrar nombre del mejor atributo best.att y su valor de ganancia (gan)
   
@@ -183,101 +192,100 @@ id3 <- function(examples, target, attributes, labels, tree) {
   
   examples <- matrix(examples,ncol=(length(attributes)+1),
                      dimnames=list(rownames=NULL,colnames=c(attributes,target)))
-
+  
   #se crea una estructura vacia de nodo
   root <- NULL
-
+  
   # ¿Tienen todos los ejemplos la misma etiqueta? 
   for (i in 1:length(labels))
     if (all(examples[,target] == labels[i])) {
-
+      
       class <- labels[i]
       root <- new.leaf(class)
-
-      print(paste("leaf ", labels[i]))
       
-
+      # print(paste("leaf ", labels[i]))
+      
+      
       return(new.tree(root))
     }
-
+  
   # ¿Se encuentra vac�?o el conjunto de los atributos?
   if (length(attributes)==0) {
-
+    
     class <- most.common.value(examples, target)
     root <- new.leaf(class)
-
-    print(paste("leaf ", root$label))
-
+    
+    # print(paste("leaf ", root$label))
+    
     return(new.tree(root))
   }
   
-  split <- TRUE
-   attribute <- best.attribute(examples, attributes, target, labels, split)
+  attribute <- best.attribute(examples, attributes, target, labels)
   
   
-   root <- new.node(attribute, VALUES[[attribute]])
-   
-   if (is.null(tree)) tree <- new.tree(root) #Si el arbol esta vacio agrego la raiz
-   cat("attribute selected: ", attribute, "\n")
+  root <- new.node(attribute, VALUES[[attribute]])
+  
+  if (is.null(tree)) tree <- new.tree(root) #Si el arbol esta vacio agrego la raiz
+  # cat("attribute selected: ", attribute, "\n")
   #print(root)
-   
-  #Va a recorrer cada valor de cada atributo -> por ejemplo para Outlook "Sunny", Overcast y Rain
-   for (i in 1:length(VALUES[[attribute]])){  
-     
-     #Add a new tree branch below Root, corresponding to the test A = vi
-     branchId <- root$branches[[i]] 
-     
-      #Selecciona el primer valor que puede tomar la variable
-     value <- as.character(VALUES[[attribute]][i])
-     print(paste("root is ", root$name, "value selected: ",value))
-    
-     
-     #Subset of examples that have value vi for A
-     Anumber <- which(attribute == colnames(examples)) #column number of attribute
-     #print(Anumber)
-    
-     fila <- which(examples[,Anumber]==value) #indices de las filas que son el valor del atributo analizado
-     #print(fila)
-     
-     examplesi <- examples[fila,] #deja todas las filas del valor del atributo completas
-     # print(examplesi)
-    
-     #examplesi as 1 row?
-     if(length(examplesi)==(length(attributes)+1)){
-       examplesi <- matrix(examplesi,ncol=(length(attributes)+1),dimnames=list(rownames=NULL,colnames=c(attributes,target)))
-     }
-     
-     if (is.null(examplesi) | nrow(examplesi)==0){
-       # Add a leaf node with label = most common value of target in examples
-       
-       #######
-       
-       class <- most.common.value(examples, target)
-       leaf <- new.leaf(class)
-       
-       tree <- add.subtree(tree, leaf, branchId)
-       
-       ########
-       
-     } else {
-       
-       # <-- ES UNA MATRIX. Es un subconjunto de Examplesi (ver seudocódigo en Mitchel.)
-       exam <- NULL
-       
-       #######
-       
-       exam <- examplesi[,-Anumber]
-       
-       ########
-       
-       subtree <- id3(exam, target, attributes[-Anumber], labels, NULL)
-           
-       tree <- add.subtree(tree,subtree,branchId)
-     }    
-     
-   }  
   
-   return(tree)
+  #Va a recorrer cada valor de cada atributo -> por ejemplo para Outlook "Sunny", Overcast y Rain
+  for (i in 1:length(VALUES[[attribute]])){  
+    
+    #Add a new tree branch below Root, corresponding to the test A = vi
+    branchId <- root$branches[[i]] 
+    
+    #Selecciona el primer valor que puede tomar la variable
+    value <- as.character(VALUES[[attribute]][i])
+    # print(paste("root is ", root$name, "value selected: ",value))
+    
+    
+    #Subset of examples that have value vi for A
+    Anumber <- which(attribute == colnames(examples)) #column number of attribute
+    #print(Anumber)
+    
+    fila <- which(examples[,Anumber]==value) #indices de las filas que son el valor del atributo analizado
+    #print(fila)
+    
+    examplesi <- examples[fila,] #deja todas las filas del valor del atributo completas
+    # print(examplesi)
+    
+    #examplesi as 1 row?
+    if(length(examplesi)==(length(attributes)+1)){
+      examplesi <- matrix(examplesi,ncol=(length(attributes)+1),dimnames=list(rownames=NULL,colnames=c(attributes,target)))
+    }
+    
+    if (is.null(examplesi) | nrow(examplesi)==0){
+      # Add a leaf node with label = most common value of target in examples
+      
+      #######
+      
+      class <- most.common.value(examples, target)
+      leaf <- new.leaf(class)
+      
+      tree <- add.subtree(tree, leaf, branchId)
+      
+      ########
+      
+    } else {
+      
+      # <-- ES UNA MATRIX. Es un subconjunto de Examplesi (ver seudocódigo en Mitchel.)
+      exam <- NULL
+      
+      #######
+      
+      exam <- examplesi[,-Anumber]
+      
+      ########
+      
+      subtree <- id3(exam, target, attributes[-Anumber], labels, NULL)
+      
+      tree <- add.subtree(tree,subtree,branchId)
+    }    
+    
+  }  
+  
+  return(tree)
 }
 
 # Classify an example from the tree model
@@ -328,7 +336,7 @@ classify.example <- function(tree=NULL, example=NULL)
       
       # Es una hoja?
       if(!is.null(tree$nodes[[f]]$label)){
-        print(paste("Resultado: ", tree$nodes[[f]]$label))
+        # print(paste("Resultado: ", tree$nodes[[f]]$label))
         label <- tree$nodes[[f]]$label
         break
       }
@@ -345,7 +353,7 @@ classify.example <- function(tree=NULL, example=NULL)
           break
         }
       }
-      print(label)
+      # print(label)
       
     }
   }
@@ -382,12 +390,11 @@ load.data <- function(path.data="../data/",name="tennis.csv")
     View(examples)
     attributes <- as.vector(dimnames(examples)[[2]])
     attributes <- attributes[-ncol(examples)] #quita la �ltima columna, porque tiene los true o false
-    View(attributes)
     etiquetas <- unique(examples[,ncol(examples)]) #obtenemos "no" y "yes", parametros para las etiquetas
     target <- (colnames(examples))[length(colnames(examples))] #devuleve playtennis
     ## las siguientes l�?neas guardan por c/atributo sus correspondientes valores
     for (i in 1:length(attributes))
-     VALUES[[attributes[i]]] <<- unique(examples[,attributes[i]]) # vector de vectores con los valores posibles por orden
+      VALUES[[attributes[i]]] <<- unique(examples[,attributes[i]]) # vector de vectores con los valores posibles por orden
   }
   else if(startsWith(name,"restaurant"))
   {
@@ -402,7 +409,7 @@ load.data <- function(path.data="../data/",name="tennis.csv")
     for (i in 1:length(attributes))
       VALUES[[attributes[i]]] <<- unique(examples[,attributes[i]])
     
-
+    
   }else if(startsWith(name,"web_sample"))
   {
     path <- paste(path.data,name,sep="")
@@ -415,25 +422,22 @@ load.data <- function(path.data="../data/",name="tennis.csv")
     ## las siguientes lineas guardan por c/atributo sus correspondientes valores
     for (i in 1:length(attributes))
       VALUES[[attributes[i]]] <<- unique(examples[,attributes[i]])
-
-  }else if(startsWith(name,"spam")){
+    
+  }else if(startsWith(name,"SPAM")){
     source("read-matrix.R") 
     m.train <- read_matrix(filename="../data/MATRIX.TRAIN.50",ocurrence=FALSE,sparse=FALSE)
-    # View(m.train)
     examples <- as.matrix(m.train$matrix)
     for(j in 1:(ncol(examples)-1)){
       dimnames(examples)[[2]][j] <- m.train$tokens[j]
     }
-    # View(examples)
     attributes <- as.vector(dimnames(examples)[[2]])
     attributes <- attributes[-ncol(examples)]
-    # View(attributes)
     etiquetas <- unique(examples[,ncol(examples)])
     target <- (colnames(examples))[length(colnames(examples))]
     for(i in 1:length(attributes))
       VALUES[[attributes[i]]] <<- unique(examples[,attributes[i]])
-  }
-  else stop("ERROR Debe brindar un dataset. Verifique argumentos path.data y name")
+    
+  }else stop("ERROR Debe brindar un dataset. Verifique argumentos path.data y name")
   return (list(target.attribute=target, labels = etiquetas, examples=examples,attributes=attributes))
 }
 
@@ -465,26 +469,12 @@ run.tree.experiment <- function(name){
   # El ejemplo dependerá del dataset con el que esté trabajando
   # Muestre en consola el ejemplo a clasificar y el resultado.
   
-  #Ejemplos para Weather
-  
   # example <- c("Rain","Mild","Normal","Strong")
   # example <- c("Rain","Mild","High","Strong")
   # example <- c("Sunny","Mild","Normal","Strong")
   # example <- c("Sunny","Mild","High","Strong")
-  # example <- c("Overcast","Mild","Normal","Strong")
+  example <- c("Overcast","Mild","Normal","Strong")
   
+  classify.example(tree=result, example=example) 
   
-  #Ejemplo Restaurant
-  
-  # example<- c("Algunos","Si","Si","$$")
-   # example<- c("Algunos","Si","Si","$$")
-   # example<- c("Ninguno", "No", "Si", "$$$")
-   # example <- c("Lleno","Si","Si","$")
-  
-  if(!(name=="spam")){
-    print("Example:")
-    print(example)
-    classify.example(tree=result, example=example)
-  }
-
 }
