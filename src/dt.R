@@ -13,6 +13,7 @@ VALUES <- list() # variable de acceso global
 entropia <- function(values){
   
   ent <- 0
+  total <- sum(values)
   
   #######
   total <- sum(values)
@@ -33,7 +34,6 @@ entropia <- function(values){
   
 }
 
-
 # Elige el mejor atributo para clasificar los ejemplos en base a 'Information Gain'.
 #
 # Los parÃ¡metros son:
@@ -50,6 +50,8 @@ best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE)
   
   #######
   
+  best.att <- "" #guardarÃ¡ nombre del mejor atributo
+
   dataTarget <- examples[,target]
   labelsTarget <- unique(examples[,target])
   canTotal <- length(dataTarget)
@@ -75,7 +77,10 @@ best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE)
     etiqueta <- unique(data[,1])
     entropias.vector <- c()
     
+    splitvalue <- 0
+
     for(j in 1:length(etiqueta)){
+
       dataEtiqueta <- matrix(data=0, nrow= length(data[which(data[,1] == etiqueta[j])]), ncol=2)
       dataEtiqueta[,1] <- data[which(data[,1] == etiqueta[j]),1]
       dataEtiqueta[,2] <- data[which(data[,1] == etiqueta[j]),2] #cortamos la tabla por etiqueta. Por ej: Sunny
@@ -97,39 +102,47 @@ best.attribute <- function(examples, attributes, target, labels, splitInf=FALSE)
       
       entropia.attribute <- entropia(p)
       entropias.vector <- c(entropias.vector,(cantDataEtiqueta/canTotal) * entropia.attribute)
-      
+      splitvalue <- splitvalue - (cantDataEtiqueta / canTotal)* log2(cantDataEtiqueta / canTotal)
       #print(dataEtiqueta[j,1])
       #print(entropia.attribute)
       #print(entropias.vector)
     }
-    
     gain.matrix[i,1] <- attributes[i]
-    gain.matrix[i,2] <- entropia.target - sum(entropias.vector)
+    
+    if(splitInf){
+      gain.matrix[i,2] <- (entropia.target - sum(entropias.vector))/splitvalue
+    }else{
+      gain.matrix[i,2] <- entropia.target - sum(entropias.vector)
+    }
     
   }
 
-    #print(gain.matrix)
-    best.att <- gain.matrix[order(gain.matrix[,2],decreasing = TRUE)[1],1]
-    gan <- gain.matrix[order(gain.matrix[,2], decreasing = TRUE)[1],2]
+  # print(gain.matrix)
+  # print("------------------------------------------")
+  best.att <- gain.matrix[order(gain.matrix[,2],decreasing = TRUE)[1],1]
+  gan <- gain.matrix[order(gain.matrix[,2], decreasing = TRUE)[1],2]
     
     
   ########
   # Mostrar nombre del mejor atributo best.att y su valor de ganancia (gan)
+  
+  print("------------------------------------------")  
   print(c('mejor attributo:',best.att,gan))
+  print("------------------------------------------")
   
   return(best.att)
 }
 
 
 # Choose the most common value from a set of examples
-#
-# The parameters of this function are:
-#     "examples" are a set of example
-#
-#     "target" is a string with the name of attribute whose value is to be
-#     predicted by the tree.
-#
-# Return a string with the name of the best attribute to classify the examples.
+  #
+  # The parameters of this function are:
+  #     "examples" are a set of example
+  #
+  #     "target" is a string with the name of attribute whose value is to be
+  #     predicted by the tree.
+  #
+  # Return a string with the name of the best attribute to classify the examples.
 most.common.value <- function(examples, target) {
   
   value <- NULL
@@ -187,7 +200,7 @@ id3 <- function(examples, target, attributes, labels, tree) {
       return(new.tree(root))
     }
 
-  # Â¿Se encuentra vacÃ?o el conjunto de los atributos?
+  # Â¿Se encuentra vacï¿½?o el conjunto de los atributos?
   if (length(attributes)==0) {
 
     class <- most.common.value(examples, target)
@@ -198,7 +211,8 @@ id3 <- function(examples, target, attributes, labels, tree) {
     return(new.tree(root))
   }
   
-   attribute <- best.attribute(examples, attributes, target, labels)
+  split <- TRUE
+   attribute <- best.attribute(examples, attributes, target, labels, split)
   
   
    root <- new.node(attribute, VALUES[[attribute]])
@@ -281,7 +295,7 @@ classify.example <- function(tree=NULL, example=NULL)
   #######
   parent <- NULL
   
-  if(is.null(parent)){ #Es la raíz?
+  if(is.null(parent)){ #Es la raï¿½z?
     
     varExam <- NULL
     
@@ -291,7 +305,7 @@ classify.example <- function(tree=NULL, example=NULL)
       
       #any -> verifica si en un arreglo al menos alguno de los valores es verdadero. 
       
-      #Si alguno de los valores del ejemplo está presente en alguna de las ramas del arbol
+      #Si alguno de los valores del ejemplo estï¿½ presente en alguna de las ramas del arbol
       if(any(example[i] == names(tree$nodes[[1]]$branches))){
         
         #Guardo la variable del ejemplo que coincide con la raiz
@@ -309,7 +323,7 @@ classify.example <- function(tree=NULL, example=NULL)
   # Itero sobre los nodos del arbol
   for(f in 2:tree$nodesCount){
     
-    # Es la raíz del subasrbol?
+    # Es la raï¿½z del subasrbol?
     if(tree$nodes[[f]]$parentId == parent){
       
       # Es una hoja?
@@ -361,18 +375,17 @@ load.data <- function(path.data="../data/",name="tennis.csv")
   examples<- NULL
   attributes <- NULL 
   
-  if(startsWith(name,"tennis"))
-  {
+  if(startsWith(name,"tennis")){
     path <- paste(path.data,name,sep="")
     examples <- read.csv(path,header=TRUE, stringsAsFactors=FALSE)
     examples <- as.matrix(examples)
     View(examples)
     attributes <- as.vector(dimnames(examples)[[2]])
-    attributes <- attributes[-ncol(examples)] #quita la última columna, porque tiene los true o false
+    attributes <- attributes[-ncol(examples)] #quita la ï¿½ltima columna, porque tiene los true o false
     View(attributes)
     etiquetas <- unique(examples[,ncol(examples)]) #obtenemos "no" y "yes", parametros para las etiquetas
     target <- (colnames(examples))[length(colnames(examples))] #devuleve playtennis
-    ## las siguientes lÃ?neas guardan por c/atributo sus correspondientes valores
+    ## las siguientes lï¿½?neas guardan por c/atributo sus correspondientes valores
     for (i in 1:length(attributes))
      VALUES[[attributes[i]]] <<- unique(examples[,attributes[i]]) # vector de vectores con los valores posibles por orden
   }
@@ -382,7 +395,7 @@ load.data <- function(path.data="../data/",name="tennis.csv")
     examples <- read.csv(path,header=TRUE, stringsAsFactors=FALSE)
     examples <- as.matrix(examples)
     attributes <- as.vector(dimnames(examples)[[2]])
-    attributes <- attributes[-ncol(examples)] #quita la última columna, porque tiene los true o false
+    attributes <- attributes[-ncol(examples)] #quita la ï¿½ltima columna, porque tiene los true o false
     etiquetas <- unique(examples[,ncol(examples)]) #obtenemos "no" y "yes", parametros para las etiquetas
     target <- (colnames(examples))[length(colnames(examples))] #devuleve playtennis
     ## las siguientes lineas guardan por c/atributo sus correspondientes valores
@@ -396,7 +409,7 @@ load.data <- function(path.data="../data/",name="tennis.csv")
     examples <- read.csv(path,header=TRUE, stringsAsFactors=FALSE)
     examples <- as.matrix(examples)
     attributes <- as.vector(dimnames(examples)[[2]])
-    attributes <- attributes[-ncol(examples)] #quita la última columna, porque tiene los true o false
+    attributes <- attributes[-ncol(examples)] #quita la ï¿½ltima columna, porque tiene los true o false
     etiquetas <- unique(examples[,ncol(examples)]) #obtenemos "no" y "yes", parametros para las etiquetas
     target <- (colnames(examples))[length(colnames(examples))] #devuleve playtennis
     ## las siguientes lineas guardan por c/atributo sus correspondientes valores
@@ -424,8 +437,7 @@ load.data <- function(path.data="../data/",name="tennis.csv")
   return (list(target.attribute=target, labels = etiquetas, examples=examples,attributes=attributes))
 }
 
-run.tree.experiment <- function(name)
-{
+run.tree.experiment <- function(name){
   
   # 1- CARGA DE DATOS
   # path.data : donde se encuentra el directorio data de este laboratorio 1
@@ -433,12 +445,12 @@ run.tree.experiment <- function(name)
   # COMPLETO
   dataset <- load.data(path.data="../data/",name) 
   ## Para ver los elementos de dataset, 
-  ## descomente las siguientes lÃ?neas antes de ejecutar
+  ## descomente las siguientes lï¿½?neas antes de ejecutar
   print("target: ")
   print(dataset$target.attribute)
-  print("labels: ")
+  print("---labels:---------------------------------------------------------------")
   print(dataset$labels)
-  print("attributes: ")
+  print("---attributes:-----------------------------------------------------------")
   print(dataset$attributes)
   
   # 2- CONSTRUCCIÃ“N DEL ÃRBOL USANDO ID3

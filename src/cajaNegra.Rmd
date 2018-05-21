@@ -71,9 +71,8 @@ La funcion ggplot() crea un sistema de coordenadas en donde es posible agregar n
 spam <- 0
 nospam <- 0
 
-  spam <- length(which(m.train$matrix$category=="SPAM"))
-
-  nospam <- length(which(m.train$matrix$category=="NO-SPAM"))
+spam <- length(which(m.train$matrix$category=="SPAM"))
+nospam <- length(which(m.train$matrix$category=="NO-SPAM"))
 
 
 distspam<-spam/nrow(m.train$matrix)
@@ -83,7 +82,7 @@ categorias <- c("spam", "no-spam")
 distdata = data.frame(distribucion, categorias)
 
 library(ggplot2)
-ggplot(data= distdata, aes(x=distdata$categorias, y=distdata$distribucion)) + geom_bar(stat="identity", fill="red")+ ggtitle("Distribución de clases") + labs(x="Categorias", y ="Distribución") 
+ggplot(data= distdata, aes(x=distdata$categorias, y=distdata$distribucion)) + geom_bar(stat="identity", fill="red")+ ggtitle("Distribuciï¿½n de clases") + labs(x="Categorias", y ="Distribuciï¿½n") 
 
 
 
@@ -106,7 +105,7 @@ cantrepetNoSpam <- sort(colSums(rdoNospam), decreasing = TRUE)
 grafspam <- data.frame(names(cantrepetespam)[1:7], cantrepetespam[1:7])
 grafnospam <- data.frame(names(cantrepetNoSpam[1:7]), cantrepetNoSpam[1:7])
 
-ggplot(data= grafspam) + geom_bar(aes(x=grafspam$names.cantrepetespam, y= grafspam$cantrepetespam), stat="identity", fill="red", alpha=0.3, color="red") + ggtitle("Distribución") + geom_bar(aes(x=grafnospam$names.cantrepetNoSpam, y= grafnospam$cantrepetNoSpam), stat="identity", fill="blue", alpha=0.3,color="blue") + labs(x="Palabras", y="Frecuencia")
+ggplot(data= grafspam) + geom_bar(aes(x=grafspam$names.cantrepetespam, y= grafspam$cantrepetespam), stat="identity", fill="red", alpha=0.3, color="red") + ggtitle("Distribuciï¿½n") + geom_bar(aes(x=grafnospam$names.cantrepetNoSpam, y= grafnospam$cantrepetNoSpam), stat="identity", fill="blue", alpha=0.3,color="blue") + labs(x="Palabras", y="Frecuencia")
 
 ```
 
@@ -138,7 +137,7 @@ names(result) <- c("TRUE-VALUE", "PREDICTION", "CORRECT?")
 ### Punto (B) 
 Dado los resultados obtenidos en (A) y indique como calcularÃ­a la performance del clasificador.
 
-
+Teniendo en cuenta el teorema de bayes, podriamos calcular la performance del clasificador como
 
 
 
