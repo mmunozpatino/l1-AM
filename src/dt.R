@@ -458,8 +458,8 @@ run.tree.experiment <- function(name)
   # example <- c("Rain","Mild","Normal","Strong")
   # example <- c("Rain","Mild","High","Strong")
   # example <- c("Sunny","Mild","Normal","Strong")
-   # example <- c("Sunny","Mild","High","Strong")
-  example <- c("Overcast","Mild","Normal","Strong")
+  # example <- c("Sunny","Mild","High","Strong")
+  # example <- c("Overcast","Mild","Normal","Strong")
   
   
   #Ejemplo Restaurant
